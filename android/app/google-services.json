@@ -1,0 +1,71 @@
+{
+  "project_info": {
+    "project_number": "278377666917",
+    "firebase_url": "https://church-calendar-1e543.firebaseio.com",
+    "project_id": "church-calendar-1e543",
+    "storage_bucket": "church-calendar-1e543.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:278377666917:android:e414a810f5b3b12d40e98c",
+        "android_client_info": {
+          "package_name": "com.braazjr.churchcalendar"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "278377666917-h9cgai1c5c47tg5e17f2qpg3nidajlvg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.braazjr.churchcalendar",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "278377666917-l7p0l3jeuopqccqhr0jdd8og7tmubfr3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.braazjr.churchcalendar",
+            "certificate_hash": "0fe69e24d288ba8063e41f988cae98537ce9e3c6"
+          }
+        },
+        {
+          "client_id": "278377666917-p88ku1pc1jusogunf1i8514f9tprseb5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.braazjr.churchcalendar",
+            "certificate_hash": "778b911498280716bc79cfd8d766e12ba02e40ba"
+          }
+        },
+        {
+          "client_id": "278377666917-adve2cdqh3ers2u30e9dh7fb2kulqo98.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKTg_wJbm_FwT1s4HE70Uamy5m_pKYvkc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "278377666917-adve2cdqh3ers2u30e9dh7fb2kulqo98.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "278377666917-4h1up5e1thgenr7td44nl6ob0k8g9ghk.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.braazjr.churchcalendar"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
