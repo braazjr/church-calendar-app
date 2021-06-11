@@ -48,6 +48,7 @@ const checkUserFromFirestore = async (user) => {
                     .collection('users')
                     .add({ ...newUser })
                     .then(data => console.info('-- user created', data.id))
+                    .then(() => checkFCMPermissions(true))
             } else {
                 let userFound = users[0]
                 userFound.name = user.displayName
@@ -97,9 +98,19 @@ const isLeader = async () => {
     return user.ministersLead && user.ministersLead.length > 0
 }
 
+const checkFCMPermissions = async (isLogged) => {
+  const authorizationStatus = await messaging().requestPermission()
+  if (isLogged
+    && (authorizationStatus == messaging.AuthorizationStatus.AUTHORIZED || authorizationStatus == messaging.AuthorizationStatus.PROVISIONAL)) {
+    const token = await messaging().getToken()
+    await updateFCMTokenOnLoggedUser(token)
+  }
+}
+
 export {
     signInWithGoogle,
     getLoggedUser,
     logoff,
-    isLeader
+    isLeader,
+    checkFCMPermissions,
 }

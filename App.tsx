@@ -20,9 +20,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { mainStyle } from './config/styles';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import auth from '@react-native-firebase/auth';
-import { isLeader } from './src/services/authentication';
-import messaging from '@react-native-firebase/messaging';
-import { updateFCMTokenOnLoggedUser } from './src/services/user';
+import { checkFCMPermissions, isLeader } from './src/services/authentication';
 import CreateTask from './src/screens/task/CreateTask';
 import MinisterListScreen from './src/screens/minister/MinisterList';
 import HomeScreen from './src/screens/home/Home';
@@ -127,7 +125,7 @@ export default class App extends Component {
     auth()
       .onAuthStateChanged(async user => {
         const isLogged = user != null
-        this._checkFCMPermissions(isLogged)
+        checkFCMPermissions(isLogged)
         const leader = isLogged ? await isLeader() : false
         console.log('leader', leader)
 
@@ -136,15 +134,6 @@ export default class App extends Component {
 
     // messaging().onMessage(data => console.info('\nonMessage\n', data))
     // messaging().setBackgroundMessageHandler(data => console.info('\nsetBackgroundMessageHandler\n', data))
-  }
-
-  _checkFCMPermissions = async (isLogged: boolean) => {
-    const authorizationStatus = await messaging().requestPermission()
-    if (isLogged
-      && (authorizationStatus == messaging.AuthorizationStatus.AUTHORIZED || authorizationStatus == messaging.AuthorizationStatus.PROVISIONAL)) {
-      const token = await messaging().getToken()
-      await updateFCMTokenOnLoggedUser(token)
-    }
   }
 
   TabNavigators = () => {
