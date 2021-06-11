@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   Dimensions,
   ScrollView,
-  Keyboard,
   Alert,
 } from 'react-native';
 
@@ -20,7 +19,7 @@ import { styles } from './styles';
 import { getMinisters } from '../../services/minister';
 import { getLoggedUser } from '../../services/authentication';
 import { getUsersFromMinister } from '../../services/user';
-import { deleteTask } from '../../services/task';
+import { deleteTask, updateTask } from '../../services/task';
 
 const { width: vw } = Dimensions.get('window');
 // moment().format('YYYY/MM/DD')
@@ -30,22 +29,22 @@ export default class CreateTask extends Component {
   state = {
     selectedDate: moment(),
     currentDay: moment().format(),
-    taskText: '',
     keyboardHeight: 0,
     visibleHeight: Dimensions.get('window').height,
     isDateTimePickerVisible: false,
-    timeType: '',
-    creatTodo: {},
-    createEventAsyncRes: '',
-    functions: [],
     itemSaved: {},
 
+    functions: [],
     availableFunctions: [],
     ministers: [],
     users: [],
 
     loggedUser: null,
     isMinisterLead: false,
+
+    taskId: '',
+    minister: undefined,
+    ministry: undefined,
 
     actionSheetMinisterOptions: [],
     actionSheetMinistryOptions: [],
@@ -70,15 +69,15 @@ export default class CreateTask extends Component {
       minister,
       ministry,
       functions,
-    } = this.props.route.params.itemSaved || {}
+    } = this.props['route'].params.itemSaved || {}
 
     await this._getMinisters(taskId ? minister : undefined, loggedUser.ministersLead);
 
-    if (this.props.route.params.itemSaved) {
+    if (this.props['route'].params.itemSaved) {
       this.setState({
         taskId,
-        itemSaved: this.props.route.params.itemSaved,
-        selectedDate: date || this.props.route.params.currentDate,
+        itemSaved: this.props['route'].params.itemSaved,
+        selectedDate: date || this.props['route'].params.currentDate,
         minister,
         ministry,
         functions,
@@ -143,7 +142,7 @@ export default class CreateTask extends Component {
 
   _hideDateTimePicker = () => this.setState({ isDateTimePickerVisible: false });
 
-  async _handleCreateTaskData(value) {
+  async _handleCreateTaskData() {
     const {
       state: {
         taskId,
@@ -151,7 +150,6 @@ export default class CreateTask extends Component {
         ministry,
         functions,
         selectedDate,
-        ministerData,
       },
     } = this;
 
@@ -170,8 +168,7 @@ export default class CreateTask extends Component {
       functions,
     };
 
-    await value.updateTask(taskData);
-    this.props.navigation.navigate('Home');
+    await updateTask(taskData);
     return true
   };
 
@@ -233,7 +230,6 @@ export default class CreateTask extends Component {
   render() {
     const {
       state: {
-        taskText,
         visibleHeight,
         isDateTimePickerVisible,
 
@@ -258,6 +254,8 @@ export default class CreateTask extends Component {
       },
 
     } = this;
+
+    const isEdit = (selectedDate != undefined && ministry != undefined && minister != undefined)
 
     return (
       <>
@@ -513,13 +511,14 @@ export default class CreateTask extends Component {
                     styles.createTaskButton,
                     {
                       backgroundColor:
-                        taskText === ''
-                          ? '#31a09a3d'
-                          : '#32a19b',
+                        isEdit
+                          ? '#32a19b'
+                          : '#31a09a3d',
                     },
                   ]}
                   onPress={async () => {
-                    this._handleCreateTaskData(value)
+                    this._handleCreateTaskData()
+                      .then(() => this.props['navigation'].navigate('Home'))
                   }}
                 >
                   <Text
@@ -539,9 +538,9 @@ export default class CreateTask extends Component {
                     styles.createTaskButton,
                     {
                       backgroundColor:
-                        taskText === ''
-                          ? 'rgba(230, 45, 57, 0.5)'
-                          : '#e62d2d',
+                        isEdit
+                          ? '#e62d2d'
+                          : 'rgba(230, 45, 57, 0.5)',
                       marginTop: 10,
                     },
                   ]}

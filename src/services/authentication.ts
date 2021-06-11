@@ -1,6 +1,10 @@
 import auth from '@react-native-firebase/auth';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import firestore from '@react-native-firebase/firestore';
+import messaging from '@react-native-firebase/messaging';
+import { User } from '../models/user';
+import { updateFCMTokenOnLoggedUser } from './user';
+import { Alert } from 'react-native';
 
 const signInWithGoogle = async () => {
     try {
@@ -23,7 +27,7 @@ const signInWithGoogle = async () => {
     
         return userCredential
     } catch(error) {
-        alert(error)
+        Alert.alert(error)
     }
 }
 
@@ -50,7 +54,7 @@ const checkUserFromFirestore = async (user) => {
                     .then(data => console.info('-- user created', data.id))
                     .then(() => checkFCMPermissions(true))
             } else {
-                let userFound = users[0]
+                let userFound = users[0] as User
                 userFound.name = user.displayName
                 // userFound.email = user.email
                 userFound.phoneNumber = user.phoneNumber
@@ -66,7 +70,7 @@ const checkUserFromFirestore = async (user) => {
         });
 }
 
-const getLoggedUser = async () => {
+const getLoggedUser = async (): Promise<User> => {
     try {
         const uid = auth()
             .currentUser
@@ -79,7 +83,7 @@ const getLoggedUser = async () => {
             .get()
 
         const user = userData.docs[0].data()
-        return { id: userData.docs[0].id, ...user }
+        return { id: userData.docs[0].id, ...user } as User
     } catch (error) {
         console.error('GET_LOGGED_USER_ERROR', error)
     }
