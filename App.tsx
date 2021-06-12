@@ -11,15 +11,16 @@
 import 'react-native-gesture-handler';
 
 import React, { Component } from 'react';
-
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import Login from './src/screens/login/Login';
+import SplashScreen from 'react-native-splash-screen'
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { mainStyle } from './config/styles';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import auth from '@react-native-firebase/auth';
+
+import Login from './src/screens/login/Login';
+import { mainStyle } from './config/styles';
 import { checkFCMPermissions, isLeader } from './src/services/authentication';
 import CreateTask from './src/screens/task/CreateTask';
 import MinisterListScreen from './src/screens/minister/MinisterList';
@@ -130,6 +131,7 @@ export default class App extends Component {
         console.log('leader', leader)
 
         this.setState({ isLogged, user: isLogged ? user : null, isLeader: leader })
+        SplashScreen.hide()
       })
 
     // messaging().onMessage(data => console.info('\nonMessage\n', data))
