@@ -73,14 +73,14 @@ export default class MinisterListScreen extends Component {
           <View
             style={{
               width: '100%',
-              height: Dimensions.get('window').height - 170,
+              height: Dimensions.get('window').height,
               marginTop: 10,
             }}
           >
             <Text style={styles.newMinister}>ministérios</Text>
             <ScrollView
               contentContainerStyle={{
-                paddingBottom: 20,
+                // paddingBottom: 20,
               }}
             >
               {ministers.map(item => (

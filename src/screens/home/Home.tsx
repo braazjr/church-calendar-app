@@ -174,7 +174,7 @@ export default class HomeScreen extends Component {
         <View
           style={{
             flex: 1,
-            paddingTop: Platform.OS === 'ios' ? 50 : 15,
+            paddingTop: Platform.OS === 'ios' ? 50 : 35,
             backgroundColor: '#32a19b'
           }}
         >

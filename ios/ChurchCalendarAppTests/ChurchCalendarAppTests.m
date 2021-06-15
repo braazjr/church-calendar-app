@@ -7,11 +7,11 @@
 #define TIMEOUT_SECONDS 600
 #define TEXT_TO_LOOK_FOR @"Welcome to React"
 
-@interface ChurchCalendarAppV3Tests : XCTestCase
+@interface ChurchCalendarAppTests : XCTestCase
 
 @end
 
-@implementation ChurchCalendarAppV3Tests
+@implementation ChurchCalendarAppTests
 
 - (BOOL)findSubviewInView:(UIView *)view matching:(BOOL(^)(UIView *view))test
 {
