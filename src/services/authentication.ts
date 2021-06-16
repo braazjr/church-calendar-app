@@ -2,9 +2,11 @@ import auth from '@react-native-firebase/auth';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import firestore from '@react-native-firebase/firestore';
 import messaging from '@react-native-firebase/messaging';
+import { Alert } from 'react-native';
+import { appleAuth } from '@invertase/react-native-apple-authentication';
+
 import { User } from '../models/user';
 import { updateFCMTokenOnLoggedUser } from './user';
-import { Alert } from 'react-native';
 
 const signInWithGoogle = async () => {
     try {
@@ -12,21 +14,21 @@ const signInWithGoogle = async () => {
             iosClientId: '278377666917-bungfka0rudvngekh884k97378nb3322.apps.googleusercontent.com',
             webClientId: '278377666917-adve2cdqh3ers2u30e9dh7fb2kulqo98.apps.googleusercontent.com',
         });
-    
+
         const { idToken } = await GoogleSignin.signIn();
-    
+
         if (!idToken) {
             console.error('\nSIGN_IN_WITH_GOOGLE_ERROR\n')
             return
         }
-    
+
         const googleCredential = auth.GoogleAuthProvider.credential(idToken);
         const userCredential = await auth().signInWithCredential(googleCredential);
-    
+
         checkUserFromFirestore(userCredential.user)
-    
+
         return userCredential
-    } catch(error) {
+    } catch (error) {
         Alert.alert(error)
     }
 }
@@ -91,7 +93,7 @@ const getLoggedUser = async (): Promise<User> => {
 
 const logoff = async () => {
     await auth()
-      .signOut()
+        .signOut()
 
     const tokens = await GoogleSignin.getTokens()
     await GoogleSignin.clearCachedAccessToken(tokens.accessToken)
@@ -103,12 +105,31 @@ const isLeader = async () => {
 }
 
 const checkFCMPermissions = async (isLogged) => {
-  const authorizationStatus = await messaging().requestPermission()
-  if (isLogged
-    && (authorizationStatus == messaging.AuthorizationStatus.AUTHORIZED || authorizationStatus == messaging.AuthorizationStatus.PROVISIONAL)) {
-    const token = await messaging().getToken()
-    await updateFCMTokenOnLoggedUser(token)
-  }
+    const authorizationStatus = await messaging().requestPermission()
+    if (isLogged
+        && (authorizationStatus == messaging.AuthorizationStatus.AUTHORIZED || authorizationStatus == messaging.AuthorizationStatus.PROVISIONAL)) {
+        const token = await messaging().getToken()
+        await updateFCMTokenOnLoggedUser(token)
+    }
+}
+
+const signInWithApple = async () => {
+    const appleAuthRequestResponse = await appleAuth.performRequest({
+        requestedOperation: appleAuth.Operation.LOGIN,
+        requestedScopes: [
+            appleAuth.Scope.EMAIL,
+            appleAuth.Scope.FULL_NAME,
+        ],
+    });
+
+    if (!appleAuthRequestResponse.identityToken) {
+        throw 'Apple Sign-In failed - no identify token returned';
+    }
+
+    const { identityToken, nonce } = appleAuthRequestResponse;
+    const appleCredential = auth.AppleAuthProvider.credential(identityToken, nonce);
+
+    return auth().signInWithCredential(appleCredential);
 }
 
 export {
@@ -117,4 +138,5 @@ export {
     logoff,
     isLeader,
     checkFCMPermissions,
+    signInWithApple
 }

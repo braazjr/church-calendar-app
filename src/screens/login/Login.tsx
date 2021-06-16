@@ -1,10 +1,11 @@
 import React, { Component, } from "react";
-import { Image, StatusBar, TouchableOpacity, View } from "react-native";
+import { Image, Platform, StatusBar, TouchableOpacity, View } from "react-native";
 import * as Animatable from "react-native-animatable";
-import { styles } from "./styles";
 import Icon from 'react-native-vector-icons/FontAwesome';
+
+import { styles } from "./styles";
 import { mainStyle } from "../../../config/styles";
-import { signInWithGoogle } from "../../services/authentication";
+import { signInWithApple, signInWithGoogle } from "../../services/authentication";
 
 export default class LoginScreen extends Component {
     state = {
@@ -21,7 +22,6 @@ export default class LoginScreen extends Component {
                     }}
                 >
                     <View style={styles.header}>
-                        {/* <Text style={styles.text_header}>Welcome!</Text> */}
                         <Image
                             source={require('../../../assets/logo_branco.png')}
                             style={{
@@ -42,7 +42,7 @@ export default class LoginScreen extends Component {
                             style={[styles.signIn, {
                                 backgroundColor: mainStyle.secondayColor,
                                 marginTop: 15,
-                                marginBottom: 30,
+                                marginBottom: 15,
                             }]}
                         >
                             <Icon
@@ -50,6 +50,22 @@ export default class LoginScreen extends Component {
                                 size={20}
                                 color={mainStyle.primaryColor} />
                         </TouchableOpacity>
+                        {
+                            Platform.OS == 'ios' &&
+                            (
+                                <TouchableOpacity
+                                    onPress={() => signInWithApple()}
+                                    style={[styles.signIn, {
+                                        backgroundColor: mainStyle.secondayColor,
+                                    }]}
+                                >
+                                    <Icon
+                                        name="apple"
+                                        size={20}
+                                        color={mainStyle.primaryColor} />
+                                </TouchableOpacity>
+                            )
+                        }
                     </Animatable.View>
                 </View>
             </>

@@ -11,22 +11,30 @@
         <!--View Controller-->
         <scene sceneID="EHf-IW-A2E">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <viewController id="01J-lp-oVM" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="rmP-xB-rwe">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="SplashIcon" translatesAutoresizingMaskIntoConstraints="NO" id="zxP-A9-P3J">
-                                <rect key="frame" x="38" y="177" width="299" height="312"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="SplashIcon" translatesAutoresizingMaskIntoConstraints="NO" id="zxP-A9-P3J">
+                                <rect key="frame" x="0.0" y="146" width="375" height="375"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="zxP-A9-P3J" secondAttribute="height" multiplier="1:1" id="qva-0Z-a6P"/>
+                                </constraints>
                                 <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="medium"/>
                             </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="C7a-dj-Gt2"/>
                         <color key="backgroundColor" red="0.0013137619240000001" green="0.62902921440000004" blue="0.60627639290000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="zxP-A9-P3J" firstAttribute="leading" secondItem="rmP-xB-rwe" secondAttribute="leading" id="43Y-jJ-CGh"/>
+                            <constraint firstAttribute="trailing" secondItem="zxP-A9-P3J" secondAttribute="trailing" id="E67-dE-mxu"/>
+                            <constraint firstItem="zxP-A9-P3J" firstAttribute="centerX" secondItem="rmP-xB-rwe" secondAttribute="centerX" id="Hql-ge-NcN"/>
+                            <constraint firstItem="zxP-A9-P3J" firstAttribute="centerY" secondItem="rmP-xB-rwe" secondAttribute="centerY" id="lxE-PC-6DZ"/>
+                        </constraints>
                     </view>
                 </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="52" y="374.66266866566718"/>
         </scene>
