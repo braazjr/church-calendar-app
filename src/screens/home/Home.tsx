@@ -157,6 +157,9 @@ export default class HomeScreen extends Component {
         selectedDate,
         isLoading
       },
+      props: {
+        navigation
+      }
     } = this;
 
     return (
@@ -244,7 +247,7 @@ export default class HomeScreen extends Component {
             loggedUser?.ministersLead && loggedUser.ministersLead.length > 0 &&
             <TouchableOpacity
               onPress={() =>
-                this.props['navigation'].navigate('CreateTask', {
+                navigation.navigate('CreateTask', {
                   updateCurrentTask: this._getTasks,
                   currentDate,
                   // createNewCalendar: this._createNewCalendar,
@@ -303,7 +306,7 @@ export default class HomeScreen extends Component {
                 {todoList.map(item => (
                   <TouchableOpacity
                     onPress={() => {
-                      this.props['navigation'].navigate('CreateTask', {
+                      navigation.navigate('CreateTask', {
                         updateCurrentTask: this._getTasks,
                         currentDate,
                         // createNewCalendar: this._createNewCalendar,

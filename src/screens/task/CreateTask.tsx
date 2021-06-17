@@ -155,7 +155,7 @@ export default class CreateTask extends Component {
 
     const taskData = {
       id: taskId,
-      date: moment(selectedDate).toISOString(),
+      date: moment(selectedDate).toDate(),
       minister: {
         id: minister.id,
         color: minister.color,
@@ -518,7 +518,7 @@ export default class CreateTask extends Component {
                   ]}
                   onPress={async () => {
                     this._handleCreateTaskData()
-                      .then(() => this.props['navigation'].navigate('Home'))
+                      .then(() => navigation.navigate('Home'))
                   }}
                 >
                   <Text
@@ -547,11 +547,11 @@ export default class CreateTask extends Component {
                   onPress={async () => {
                     Alert
                       .alert(
-                        'Delete task',
-                        'Do you want to delete the task?',
+                        'exclusão de escala',
+                        'você quer excluir a escala?',
                         [
                           {
-                            text: 'yes',
+                            text: 'sim',
                             style: 'destructive',
                             onPress: () => {
                               this._deleteTask(taskId)
@@ -561,7 +561,7 @@ export default class CreateTask extends Component {
                             }
                           },
                           {
-                            text: 'no',
+                            text: 'não',
                             style: 'cancel'
                           }
                         ]
@@ -575,7 +575,7 @@ export default class CreateTask extends Component {
                       color: '#fff',
                     }}
                   >
-                    delete task
+                    excluir escala
                         </Text>
                 </TouchableOpacity>
               }

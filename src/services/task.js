@@ -7,6 +7,8 @@ export const deleteTask = (taskId) =>
         .delete()
 
 export const updateTask = async (item) => {
+    item.date = firestore.Timestamp.fromDate(item.date)
+
     if (item.id) {
         return firestore()
           .collection('tasks')
@@ -18,10 +20,5 @@ export const updateTask = async (item) => {
           .collection('tasks')
           // .doc()
           .add({...item})
-          .then(data => {
-            this.setState({
-              taskId: data.id,
-            });
-          })
       }
 }

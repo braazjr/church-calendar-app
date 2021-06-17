@@ -120,6 +120,7 @@ export default class MinisterRegister extends Component {
         newFunction,
         itemSaved,
       },
+      props: { navigation }
     } = this;
 
     return (
@@ -135,13 +136,13 @@ export default class MinisterRegister extends Component {
                 paddingBottom: 100,
               }}
             >
-                            
+
               <View
                 style={{ flexDirection: 'row', marginTop: 60 }}
               >
                 <View style={styles.backButton}>
                   <TouchableOpacity
-                    onPress={() => this.props['navigation'].navigate('ministérios')}
+                    onPress={() => navigation.navigate('ministérios')}
                     style={{ marginRight: vw / 2 - 120, marginLeft: 20 }}
                   >
                     <Icon
@@ -234,8 +235,8 @@ export default class MinisterRegister extends Component {
                   <View style={styles.seperator} />
                 </View>
 
-                               
-               <View>
+
+                <View>
                   {
                     itemSaved.id && (
                       <Text
@@ -304,7 +305,7 @@ export default class MinisterRegister extends Component {
                   </View>
                   <View style={styles.seperator} />
                 </View>
-              
+
               </View>
 
 
@@ -317,7 +318,7 @@ export default class MinisterRegister extends Component {
                   }
                 ]}
                 onPress={() => {
-                  this.props['navigation'].navigate('ManageUsers', {
+                  navigation.navigate('ManageUsers', {
                     ministerId: ministerId,
                   })
                 }}
@@ -348,7 +349,7 @@ export default class MinisterRegister extends Component {
                 onPress={async () => {
                   this._handleCreateministerData()
                     .then(() => {
-                      this.props['navigation'].navigate('Home')
+                      navigation.navigate('Home')
                     })
                 }}
               >

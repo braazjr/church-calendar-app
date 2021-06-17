@@ -91,6 +91,7 @@ export default class ManagerUsers extends Component {
         avaiableUsers,
         usersFound,
       },
+      props: { navigation }
     } = this;
 
     return (
@@ -111,7 +112,7 @@ export default class ManagerUsers extends Component {
               >
                 <View style={styles.backButton}>
                   <TouchableOpacity
-                    onPress={() => this.props['navigation'].navigate('ministérios')}
+                    onPress={() => navigation.navigate('ministérios')}
                     style={{ marginRight: vw / 2 - 120, marginLeft: 20 }}
                   >
                     <Icon

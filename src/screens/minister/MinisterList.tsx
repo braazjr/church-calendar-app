@@ -40,7 +40,7 @@ export default class MinisterListScreen extends Component {
       state: {
         ministers
       },
-      // props: { navigation },
+      props: { navigation },
     } = this;
 
     return (
@@ -54,7 +54,7 @@ export default class MinisterListScreen extends Component {
         >
           <TouchableOpacity
             onPress={() => {
-              this.props['navigation'].navigate('MinisterRegister', {
+              navigation.navigate('MinisterRegister', {
               })
             }}
             style={styles.view}
@@ -86,7 +86,7 @@ export default class MinisterListScreen extends Component {
               {ministers.map(item => (
                 <TouchableOpacity
                   onPress={() => {
-                    this.props['navigation'].navigate('MinisterRegister', {
+                    navigation.navigate('MinisterRegister', {
                       itemSaved: {
                         ...item,
                       }
