@@ -78,6 +78,10 @@ export default class HomeScreen extends Component {
         .onSnapshot(observer => {
           let tasks = observer.docs
             .map(doc => ({ id: doc.id, ...doc.data() }))
+            .map(doc => {
+              doc.date = moment(doc.date._seconds * 1000)
+              return doc
+            })
 
           const tasksByDate = tasks
             .filter(task => this._formatDateToCompare(task.date) == this._formatDateToCompare(currentDate))
@@ -346,7 +350,7 @@ export default class HomeScreen extends Component {
                             fontWeight: '700',
                           }}
                         >
-                          {item.minister.name} - {moment(item.date).format('HH:MM')}
+                          {item.minister.name} - {moment(item.date).format('HH:mm')}
                         </Text>
                       </View>
                       <View>

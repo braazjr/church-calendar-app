@@ -27,6 +27,7 @@ import MinisterListScreen from './src/screens/minister/MinisterList';
 import HomeScreen from './src/screens/home/Home';
 import MinisterRegister from './src/screens/minister/register/MinisterRegister';
 import ManagerUsers from './src/screens/minister/register/ManageUsers';
+import ChangeRequestsScreen from './src/screens/change-requests/change-requests-screen';
 
 //  const Section: React.FC<{
 //    title: string;
@@ -172,6 +173,9 @@ export default class App extends Component {
               case 'ministérios':
                 iconName = 'users'
                 break;
+                case 'trocas':
+                  iconName = 'exchange'
+                  break;
               default:
                 break;
             }
@@ -185,6 +189,7 @@ export default class App extends Component {
         })}>
         <Tab.Screen name={'calendário'} component={HomeScreen} />
         {isLeader && (<Tab.Screen name={'ministérios'} component={MinisterListScreen} />)}
+        <Tab.Screen name={'trocas'} component={ChangeRequestsScreen} />
       </Tab.Navigator>
     )
   }

@@ -20,6 +20,8 @@ import { getMinisters } from '../../services/minister';
 import { getLoggedUser } from '../../services/authentication';
 import { getUsersFromMinister } from '../../services/user';
 import { deleteTask, updateTask } from '../../services/task';
+import { createChangeRequest } from '../../services/change-requests.service';
+import { Task } from '../../models/task-model';
 
 const { width: vw } = Dimensions.get('window');
 // moment().format('YYYY/MM/DD')
@@ -32,7 +34,7 @@ export default class CreateTask extends Component {
     keyboardHeight: 0,
     visibleHeight: Dimensions.get('window').height,
     isDateTimePickerVisible: false,
-    itemSaved: {},
+    itemSaved: new Task(),
 
     functions: [],
     availableFunctions: [],
@@ -225,6 +227,12 @@ export default class CreateTask extends Component {
 
   async _deleteTask(taskId) {
     return deleteTask(taskId)
+  }
+
+  async _changeRequest() {
+    const { taskId } = this.state
+
+    return createChangeRequest(taskId)
   }
 
   render() {
@@ -578,6 +586,56 @@ export default class CreateTask extends Component {
                     excluir escala
                         </Text>
                 </TouchableOpacity>
+              }
+              {
+                moment().isBefore(selectedDate) && !itemSaved.hasOpenChangeRequest &&
+                (
+                  <TouchableOpacity
+                    style={[
+                      styles.createTaskButton,
+                      {
+                        backgroundColor:
+                          isEdit
+                            ? '#a09c31'
+                            : '#a09e313d',
+                        marginTop: 10,
+                      },
+                    ]}
+                    onPress={async () => {
+                      Alert
+                        .alert(
+                          'solicitação de troca',
+                          'deseja solicitar a troca?',
+                          [
+                            {
+                              text: 'sim',
+                              style: 'destructive',
+                              onPress: () => {
+                                this._changeRequest()
+                                  .then(() => {
+                                    navigation.navigate('Home')
+                                  })
+                              }
+                            },
+                            {
+                              text: 'não',
+                              style: 'cancel'
+                            }
+                          ]
+                        )
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 18,
+                        textAlign: 'center',
+                        color: '#fff',
+                      }}
+                    >
+                      não posso no dia
+                          </Text>
+                  </TouchableOpacity>
+                )
               }
             </ScrollView>
           </View>
