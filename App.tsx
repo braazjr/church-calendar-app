@@ -154,7 +154,6 @@ export default class App extends Component {
             borderTopWidth: 3,
             elevation: 0,
             borderTopColor: mainStyle.primaryColor,
-            borderRadius: 25,
           },
           tabStyle: {
             paddingTop: 5,

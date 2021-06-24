@@ -14,7 +14,7 @@ export const getChangeRequests = async () => {
         if (user.ministers && user.ministers.length > 0) {
             return changeRequestCollection
                 .where('task.minister.id', 'in', user.ministers || [])
-                .where('task.date', '>=', firestore.Timestamp.now())
+                .where('task.date', '>=', firestore.Timestamp.now().toDate())
                 .onSnapshot(observer => {
                     if (!observer) {
                         resolve([])

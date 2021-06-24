@@ -5,8 +5,8 @@ import {
   TouchableOpacity,
   Dimensions,
   ScrollView,
-  Keyboard,
   TextInput,
+  Platform,
 } from 'react-native';
 
 import moment from 'moment';
@@ -100,6 +100,7 @@ export default class ManagerUsers extends Component {
           <View
             style={{
               height: visibleHeight,
+              paddingTop: Platform.OS == 'android' ? 26 :  50,
             }}
           >
             <ScrollView
@@ -108,7 +109,7 @@ export default class ManagerUsers extends Component {
               }}
             >
               <View
-                style={{ flexDirection: 'row', marginTop: 60 }}
+                style={{ flexDirection: 'row' }}
               >
                 <View style={styles.backButton}>
                   <TouchableOpacity

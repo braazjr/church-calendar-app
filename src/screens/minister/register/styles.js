@@ -110,7 +110,7 @@ export const styles = StyleSheet.create({
     },
     container: {
       flex: 1,
-      paddingTop: Platform.OS === 'ios' ? 50 : 15,
+      paddingTop: 50,
       backgroundColor: '#31a09a3d',
     },
     listContent: {

@@ -48,7 +48,7 @@ export default class MinisterListScreen extends Component {
         <View
           style={{
             flex: 1,
-            paddingTop: Platform.OS === 'ios' ? 50 : 15,
+            paddingTop: Platform.OS == 'android' ? 26 :  50,
             backgroundColor: '#fff'
           }}
         >
@@ -80,7 +80,7 @@ export default class MinisterListScreen extends Component {
             <Text style={styles.newMinister}>ministérios</Text>
             <ScrollView
               contentContainerStyle={{
-                // paddingBottom: 20,
+                paddingBottom: Platform.OS == 'android' ? 100 : 180,
               }}
             >
               {ministers.map(item => (

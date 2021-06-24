@@ -52,21 +52,25 @@ export default class ChangeRequestsScreen extends Component {
         <View
           style={{
             flex: 1,
-            paddingTop: Platform.OS === 'ios' ? 50 : 15,
+            paddingTop: Platform.OS == 'android' ? 26 : 50,
             backgroundColor: '#fff'
           }}
         >
           <View
             style={{
               width: '100%',
-              height: Dimensions.get('window').height,
+              height: Dimensions.get('window').height - 100,
               marginTop: 10,
             }}
           >
             <Text style={styles.title}>
               trocas
             </Text>
-            <ScrollView>
+            <ScrollView
+              contentContainerStyle={{
+                paddingBottom: 100,
+              }}
+            >
               {changeRequests.map(item => (
                 <View
                   key={item.id}

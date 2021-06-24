@@ -5,9 +5,9 @@ import {
   TouchableOpacity,
   Dimensions,
   ScrollView,
-  Keyboard,
   Alert,
   TextInput,
+  Platform,
 } from 'react-native';
 
 import moment from 'moment';
@@ -129,6 +129,7 @@ export default class MinisterRegister extends Component {
           <View
             style={{
               height: visibleHeight,
+              paddingTop: Platform.OS == 'android' ? 26 :  50,
             }}
           >
             <ScrollView
@@ -138,7 +139,7 @@ export default class MinisterRegister extends Component {
             >
 
               <View
-                style={{ flexDirection: 'row', marginTop: 60 }}
+                style={{ flexDirection: 'row' }}
               >
                 <View style={styles.backButton}>
                   <TouchableOpacity

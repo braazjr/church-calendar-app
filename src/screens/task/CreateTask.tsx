@@ -6,6 +6,7 @@ import {
   Dimensions,
   ScrollView,
   Alert,
+  Platform,
 } from 'react-native';
 
 import { CalendarList } from 'react-native-calendars';
@@ -309,16 +310,17 @@ export default class CreateTask extends Component {
         <View style={styles.container}>
           <View
             style={{
-              height: visibleHeight,
+              height: Platform.OS == 'android' ? '100%' : visibleHeight,
+              paddingTop: Platform.OS == 'android' ? 76 : 80,
             }}
           >
             <ScrollView
               contentContainerStyle={{
-                paddingBottom: 100,
+                paddingBottom: Platform.OS == 'android' ? 50 : 100,
               }}
             >
               <View
-                style={{ flexDirection: 'row', marginTop: 60 }}
+                style={{ flexDirection: 'row' }}
               >
                 <View style={styles.backButton}>
                   <TouchableOpacity
@@ -466,51 +468,58 @@ export default class CreateTask extends Component {
                   <View style={styles.seperator} />
                 </View>
 
-                <Text
-                  style={{
-                    fontSize: 14,
-                    color: '#BDC6D8',
-                    marginVertical: 10,
-                  }}
-                >
-                  funções
-                    </Text>
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-                  {
-                    availableFunctions
-                      .map((func, index) => ({
-                        name: func,
-                        index,
-                        buttonStyle: (functions || []).indexOf(func) >= 0 ? styles.readBook : styles.readBookOff
-                      }))
-                      .map(func => (
-                        <View
-                          style={func.buttonStyle}
-                          key={func.index}
-                        >
-                          <TouchableOpacity
-                            onPress={() => {
-                              if ((!taskId || isMinisterLead)) {
-                                const index = functions.indexOf(func.name)
-                                if (index >= 0) {
-                                  functions.splice(index, 1)
-                                } else {
-                                  functions.push(func.name)
-                                }
+                {
+                  availableFunctions.length > 0 &&
+                  (
+                    <View>
+                      <Text
+                        style={{
+                          fontSize: 14,
+                          color: '#BDC6D8',
+                          marginVertical: 10,
+                        }}
+                      >
+                        funções
+                        </Text>
+                      <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                        {
+                          availableFunctions
+                            .map((func, index) => ({
+                              name: func,
+                              index,
+                              buttonStyle: (functions || []).indexOf(func) >= 0 ? styles.readBook : styles.readBookOff
+                            }))
+                            .map(func => (
+                              <View
+                                style={func.buttonStyle}
+                                key={func.index}
+                              >
+                                <TouchableOpacity
+                                  onPress={() => {
+                                    if ((!taskId || isMinisterLead)) {
+                                      const index = functions.indexOf(func.name)
+                                      if (index >= 0) {
+                                        functions.splice(index, 1)
+                                      } else {
+                                        functions.push(func.name)
+                                      }
 
-                                this.setState({
-                                  functions
-                                })
-                              }
-                            }}>
-                            <Text style={{ textAlign: 'center', fontSize: 14 }}>
-                              {func.name}
-                            </Text>
-                          </TouchableOpacity>
-                        </View>
-                      ))
-                  }
-                </View>
+                                      this.setState({
+                                        functions
+                                      })
+                                    }
+                                  }}>
+                                  <Text style={{ textAlign: 'center', fontSize: 14 }}>
+                                    {func.name}
+                                  </Text>
+                                </TouchableOpacity>
+                              </View>
+                            ))
+                        }
+                      </View>
+                    </View>
+                  )
+                }
               </View>
               {
                 (!taskId || isMinisterLead) &&
@@ -588,7 +597,7 @@ export default class CreateTask extends Component {
                 </TouchableOpacity>
               }
               {
-                moment().isBefore(selectedDate) && !itemSaved.hasOpenChangeRequest &&
+                moment().isBefore(selectedDate) && !itemSaved.hasOpenChangeRequest && (!!taskId) &&
                 (
                   <TouchableOpacity
                     style={[
@@ -633,7 +642,7 @@ export default class CreateTask extends Component {
                       }}
                     >
                       não posso no dia
-                          </Text>
+                    </Text>
                   </TouchableOpacity>
                 )
               }

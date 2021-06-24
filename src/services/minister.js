@@ -14,7 +14,6 @@ const updateMinister = item => {
                 .set(Object.assign({}, item))
                 .then(() => resolve(item.id))
         } else {
-            delete item.id
             return firestore()
                 .collection('ministers')
                 .add({ ...item })
