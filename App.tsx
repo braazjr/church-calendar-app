@@ -120,7 +120,7 @@ export default class App extends Component {
   state = {
     isLogged: false,
     user: null,
-    isLeader: false
+    isLeader: false,
   }
 
   async componentDidMount() {
@@ -154,7 +154,6 @@ export default class App extends Component {
             borderTopWidth: 3,
             elevation: 0,
             borderTopColor: mainStyle.primaryColor,
-            borderRadius: 25,
           },
           tabStyle: {
             paddingTop: 5,
@@ -173,9 +172,9 @@ export default class App extends Component {
               case 'ministérios':
                 iconName = 'users'
                 break;
-                case 'trocas':
-                  iconName = 'exchange'
-                  break;
+              case 'trocas':
+                iconName = 'exchange'
+                break;
               default:
                 break;
             }
@@ -187,7 +186,7 @@ export default class App extends Component {
             />
           }
         })}>
-        <Tab.Screen name={'calendário'} component={HomeScreen} />
+        <Tab.Screen name={'calendário'} component={HomeScreen} initialParams={{ setIsLoading: this.setIsLoading }} />
         {isLeader && (<Tab.Screen name={'ministérios'} component={MinisterListScreen} />)}
         <Tab.Screen name={'trocas'} component={ChangeRequestsScreen} />
       </Tab.Navigator>
