@@ -159,15 +159,6 @@ export default class HomeScreen extends Component {
     this._hideDateTimePicker();
   };
 
-  handleAlarmSet = () => {
-    const { selectedTask } = this.state;
-    const prevSelectedTask = { ...selectedTask };
-    prevSelectedTask.alarm.isOn = !prevSelectedTask.alarm.isOn;
-    this.setState({
-      selectedTask: prevSelectedTask,
-    });
-  };
-
   logoff() {
     logoff()
   }
@@ -356,7 +347,7 @@ export default class HomeScreen extends Component {
                               }}
                             >
                               nesse dia você está de folga :)
-                          </Text>
+                            </Text>
                           </View>
                         )
                       }

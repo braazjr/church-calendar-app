@@ -67,6 +67,47 @@ export default class ChangeRequestsScreen extends Component {
               trocas
             </Text>
             <ScrollView>
+              {
+                changeRequests.length == 0 &&
+                (
+                  <View
+                    style={[
+                      styles.listContent,
+                      {
+                        alignContent: 'center',
+                        flexDirection: 'column',
+                        padding: 20,
+                        backgroundColor: 'rgba(230, 166, 45, 0.5)',
+                      }]}
+                  >
+                    <Text
+                      style={{
+                        flex: 1,
+                        color: 'black',
+                        fontSize: 18,
+                        fontWeight: '700',
+                        marginBottom: 10,
+                      }}
+                    >
+                      sem trocas!
+                    </Text>
+                    <Text
+                      style={{
+                        flex: 1,
+                        color: 'black',
+                        fontSize: 14,
+                        textAlign: 'center',
+                      }}
+                    >
+                      se você deseja solicitar uma troca,{'\n'}
+                      vá até sua escala e clique no{'\n'}
+                      botão chamado 'não posso no dia'.{'\n'}
+                      com isso, seus amigos de ministério{'\n'}
+                      poderão te substituir!
+                    </Text>
+                  </View>
+                )
+              }
               {changeRequests.map(item => (
                 <View
                   key={item.id}
