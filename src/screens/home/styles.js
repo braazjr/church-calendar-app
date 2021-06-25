@@ -23,7 +23,7 @@ export const styles = StyleSheet.create({
     },
     viewTask: {
       position: 'absolute',
-      bottom: 40,
+      bottom: 180,
       right: 17,
       height: 60,
       width: 60,

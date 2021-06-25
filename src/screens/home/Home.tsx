@@ -18,6 +18,7 @@ import { getLoggedUser, logoff } from '../../services/authentication';
 import LoadingComponent from '../../components/loading.component';
 import { CalendarList, MultiDotMarking } from 'react-native-calendars';
 import { mainStyle } from '../../../config/styles';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 export default class HomeScreen extends Component {
   state = {
@@ -171,6 +172,14 @@ export default class HomeScreen extends Component {
     logoff()
   }
 
+  hasTodayTask() {
+    const { currentDate, loggedUser, todoList } = this.state
+    console.log('\nloggedUser\n', loggedUser)
+    console.log('\ntodoList\n', todoList)
+    return todoList.filter(task => task.ministry.id == loggedUser.id
+      && this._formatDateToCompare(task.date) == currentDate).length > 0
+  }
+
   render() {
     const {
       state: {
@@ -213,6 +222,31 @@ export default class HomeScreen extends Component {
               marginTop: 60,
             }}
           >
+            {
+              loggedUser?.ministersLead && loggedUser.ministersLead.length > 0 &&
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate('CreateTask', {
+                    updateCurrentTask: this._getTasks,
+                    currentDate,
+                    // createNewCalendar: this._createNewCalendar,
+                  })
+                }
+                style={styles.viewTask}
+              >
+                <Icon
+                  name="plus"
+                  color={'#fff'}
+                  size={30}
+                  style={{
+                    paddingLeft: 2,
+                    paddingTop: 2,
+                    alignSelf: 'center',
+                    // paddingTop: 20,
+                  }}
+                />
+              </TouchableOpacity>
+            }
             <ScrollView
               contentContainerStyle={{
                 paddingBottom: 100,
@@ -291,6 +325,41 @@ export default class HomeScreen extends Component {
                         paddingBottom: 20,
                       }}
                     >
+                      {
+                        (todoList.length == 0 || !this.hasTodayTask()) &&
+                        (
+                          <View
+                            style={[
+                              styles.taskListContent,
+                              {
+                                alignContent: 'center',
+                                flexDirection: 'column',
+                                padding: 20,
+                                backgroundColor: 'rgba(230, 166, 45, 0.5)',
+                              }]}
+                          >
+                            <Text
+                              style={{
+                                flex: 1,
+                                color: 'black',
+                                fontSize: 18,
+                                fontWeight: '700',
+                              }}
+                            >
+                              pode descansar!
+                          </Text>
+                            <Text
+                              style={{
+                                flex: 1,
+                                color: 'black',
+                                fontSize: 14,
+                              }}
+                            >
+                              nesse dia você está de folga :)
+                          </Text>
+                          </View>
+                        )
+                      }
                       {todoList.map(item => (
                         <TouchableOpacity
                           onPress={() => {
