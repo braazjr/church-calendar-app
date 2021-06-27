@@ -133,7 +133,7 @@ export default class MinisterRegister extends Component {
           >
             <ScrollView
               contentContainerStyle={{
-                paddingBottom: 100,
+                paddingBottom: '30%',
               }}
             >
 

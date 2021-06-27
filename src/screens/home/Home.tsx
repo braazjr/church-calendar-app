@@ -11,14 +11,14 @@ import DateTimePicker from 'react-native-modal-datetime-picker';
 import moment from 'moment';
 import firestore from '@react-native-firebase/firestore';
 import * as lodash from 'lodash';
+import { CalendarList, MultiDotMarking } from 'react-native-calendars';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 import { Task } from '../../components/Task';
 import { styles } from './styles'
 import { getLoggedUser, logoff } from '../../services/authentication';
 import LoadingComponent from '../../components/loading.component';
-import { CalendarList, MultiDotMarking } from 'react-native-calendars';
 import { mainStyle } from '../../../config/styles';
-import Icon from 'react-native-vector-icons/FontAwesome';
 
 export default class HomeScreen extends Component {
   state = {
@@ -164,17 +164,13 @@ export default class HomeScreen extends Component {
   }
 
   hasTodayTask() {
-    const { currentDate, loggedUser, todoList } = this.state
-    console.log('\nloggedUser\n', loggedUser)
-    console.log('\ntodoList\n', todoList)
-    return todoList.filter(task => task.ministry.id == loggedUser.id
-      && this._formatDateToCompare(task.date) == currentDate).length > 0
+    const { loggedUser, todoList } = this.state
+    return todoList.filter(task => task.ministry.id == loggedUser.id).length > 0
   }
 
   render() {
     const {
       state: {
-        datesWhitelist,
         visibleHeight,
         markedDates,
         todoList,
@@ -210,7 +206,7 @@ export default class HomeScreen extends Component {
           <View
             style={{
               height: visibleHeight,
-              marginTop: 60,
+              marginTop: 50,
             }}
           >
             {
@@ -281,7 +277,7 @@ export default class HomeScreen extends Component {
               </View>
               <View>
                 <View style={{ backgroundColor: '#fff', paddingTop: 20 }}>
-                  <TouchableOpacity
+                  {/* <TouchableOpacity
                     style={{
                       width: 'auto',
                       height: 'auto',
@@ -302,9 +298,9 @@ export default class HomeScreen extends Component {
                         color: '#fff'
                       }}
                     >
-                      sair
+                      logout
                 </Text>
-                  </TouchableOpacity>
+                  </TouchableOpacity> */}
                   <View
                     style={{
                       width: '100%',
