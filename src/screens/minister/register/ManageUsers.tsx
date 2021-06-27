@@ -5,8 +5,8 @@ import {
   TouchableOpacity,
   Dimensions,
   ScrollView,
-  Keyboard,
   TextInput,
+  Platform,
 } from 'react-native';
 
 import moment from 'moment';
@@ -100,6 +100,7 @@ export default class ManagerUsers extends Component {
           <View
             style={{
               height: visibleHeight,
+              paddingTop: Platform.OS == 'android' ? 26 :  50,
             }}
           >
             <ScrollView
@@ -108,7 +109,7 @@ export default class ManagerUsers extends Component {
               }}
             >
               <View
-                style={{ flexDirection: 'row', marginTop: 60 }}
+                style={{ flexDirection: 'row' }}
               >
                 <View style={styles.backButton}>
                   <TouchableOpacity
@@ -134,25 +135,30 @@ export default class ManagerUsers extends Component {
 
 
               <View style={styles.formContainer}>
-                <View
-                  style={{ marginBottom: 25 }}
-                >
-                  <TextInput
-                    style={styles.title}
-                    onChange={text => {
-                      this.setState({ newUser: text.nativeEvent.text })
+                {
+                  avaiableUsers.length > 0 &&
+                  (
+                    <View
+                      style={{ marginBottom: 25 }}
+                    >
+                      <TextInput
+                        style={styles.title}
+                        onChange={text => {
+                          this.setState({ newUser: text.nativeEvent.text })
 
-                      if (text.nativeEvent.text.length >= 3) {
-                        this.setState({
-                          usersFound: avaiableUsers
-                            .filter(us => us.name.toLowerCase().includes(newUser.toLowerCase()) && !users.map(u => u.name).includes(us.name))
-                        })
-                      }
-                    }}
-                    value={newUser}
-                    placeholder="pesquise novo ministro"
-                  />
-                </View>
+                          if (text.nativeEvent.text.length >= 3) {
+                            this.setState({
+                              usersFound: avaiableUsers
+                                .filter(us => us.name.toLowerCase().includes(newUser.toLowerCase()) && !users.map(u => u.name).includes(us.name))
+                            })
+                          }
+                        }}
+                        value={newUser}
+                        placeholder="pesquise novo ministro"
+                      />
+                    </View>
+                  )
+                }
 
                 {usersFound.map(item => (
                   <View

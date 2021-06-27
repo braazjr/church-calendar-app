@@ -5,7 +5,7 @@ import messaging from '@react-native-firebase/messaging';
 import { Alert } from 'react-native';
 import { appleAuth } from '@invertase/react-native-apple-authentication';
 
-import { User } from '../models/user';
+import { User } from '../models/user-model';
 import { updateFCMTokenOnLoggedUser } from './user';
 
 const signInWithGoogle = async () => {
@@ -57,10 +57,10 @@ const checkUserFromFirestore = async (user) => {
                     .then(() => checkFCMPermissions(true))
             } else {
                 let userFound = users[0] as User
-                userFound.name = user.displayName
+                userFound.name = user.displayName || userFound.name
                 // userFound.email = user.email
-                userFound.phoneNumber = user.phoneNumber
-                userFound.photoUrl = user.photoURL
+                userFound.phoneNumber = user.phoneNumber|| userFound.phoneNumber
+                userFound.photoUrl = user.photoURL|| userFound.photoUrl
                 userFound.uid = user.uid
 
                 firestore()

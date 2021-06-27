@@ -6,6 +6,7 @@ import {
   Dimensions,
   ScrollView,
   Alert,
+  Platform,
 } from 'react-native';
 
 import { CalendarList } from 'react-native-calendars';
@@ -20,6 +21,8 @@ import { getMinisters } from '../../services/minister';
 import { getLoggedUser } from '../../services/authentication';
 import { getUsersFromMinister } from '../../services/user';
 import { deleteTask, updateTask } from '../../services/task';
+import { createChangeRequest } from '../../services/change-requests.service';
+import { Task } from '../../models/task-model';
 
 const { width: vw } = Dimensions.get('window');
 // moment().format('YYYY/MM/DD')
@@ -32,7 +35,7 @@ export default class CreateTask extends Component {
     keyboardHeight: 0,
     visibleHeight: Dimensions.get('window').height,
     isDateTimePickerVisible: false,
-    itemSaved: {},
+    itemSaved: new Task(),
 
     functions: [],
     availableFunctions: [],
@@ -227,6 +230,12 @@ export default class CreateTask extends Component {
     return deleteTask(taskId)
   }
 
+  async _changeRequest() {
+    const { taskId } = this.state
+
+    return createChangeRequest(taskId)
+  }
+
   render() {
     const {
       state: {
@@ -301,16 +310,17 @@ export default class CreateTask extends Component {
         <View style={styles.container}>
           <View
             style={{
-              height: visibleHeight,
+              height: Platform.OS == 'android' ? '100%' : visibleHeight,
+              paddingTop: Platform.OS == 'android' ? 76 : 80,
             }}
           >
             <ScrollView
               contentContainerStyle={{
-                paddingBottom: 100,
+                paddingBottom: Platform.OS == 'android' ? 50 : 100,
               }}
             >
               <View
-                style={{ flexDirection: 'row', marginTop: 60 }}
+                style={{ flexDirection: 'row' }}
               >
                 <View style={styles.backButton}>
                   <TouchableOpacity
@@ -458,51 +468,58 @@ export default class CreateTask extends Component {
                   <View style={styles.seperator} />
                 </View>
 
-                <Text
-                  style={{
-                    fontSize: 14,
-                    color: '#BDC6D8',
-                    marginVertical: 10,
-                  }}
-                >
-                  funções
-                    </Text>
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-                  {
-                    availableFunctions
-                      .map((func, index) => ({
-                        name: func,
-                        index,
-                        buttonStyle: (functions || []).indexOf(func) >= 0 ? styles.readBook : styles.readBookOff
-                      }))
-                      .map(func => (
-                        <View
-                          style={func.buttonStyle}
-                          key={func.index}
-                        >
-                          <TouchableOpacity
-                            onPress={() => {
-                              if ((!taskId || isMinisterLead)) {
-                                const index = functions.indexOf(func.name)
-                                if (index >= 0) {
-                                  functions.splice(index, 1)
-                                } else {
-                                  functions.push(func.name)
-                                }
+                {
+                  availableFunctions.length > 0 &&
+                  (
+                    <View>
+                      <Text
+                        style={{
+                          fontSize: 14,
+                          color: '#BDC6D8',
+                          marginVertical: 10,
+                        }}
+                      >
+                        funções
+                        </Text>
+                      <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                        {
+                          availableFunctions
+                            .map((func, index) => ({
+                              name: func,
+                              index,
+                              buttonStyle: (functions || []).indexOf(func) >= 0 ? styles.readBook : styles.readBookOff
+                            }))
+                            .map(func => (
+                              <View
+                                style={func.buttonStyle}
+                                key={func.index}
+                              >
+                                <TouchableOpacity
+                                  onPress={() => {
+                                    if ((!taskId || isMinisterLead)) {
+                                      const index = functions.indexOf(func.name)
+                                      if (index >= 0) {
+                                        functions.splice(index, 1)
+                                      } else {
+                                        functions.push(func.name)
+                                      }
 
-                                this.setState({
-                                  functions
-                                })
-                              }
-                            }}>
-                            <Text style={{ textAlign: 'center', fontSize: 14 }}>
-                              {func.name}
-                            </Text>
-                          </TouchableOpacity>
-                        </View>
-                      ))
-                  }
-                </View>
+                                      this.setState({
+                                        functions
+                                      })
+                                    }
+                                  }}>
+                                  <Text style={{ textAlign: 'center', fontSize: 14 }}>
+                                    {func.name}
+                                  </Text>
+                                </TouchableOpacity>
+                              </View>
+                            ))
+                        }
+                      </View>
+                    </View>
+                  )
+                }
               </View>
               {
                 (!taskId || isMinisterLead) &&
@@ -578,6 +595,56 @@ export default class CreateTask extends Component {
                     excluir escala
                         </Text>
                 </TouchableOpacity>
+              }
+              {
+                moment().isBefore(selectedDate) && !itemSaved.hasOpenChangeRequest && (!!taskId) &&
+                (
+                  <TouchableOpacity
+                    style={[
+                      styles.createTaskButton,
+                      {
+                        backgroundColor:
+                          isEdit
+                            ? '#a09c31'
+                            : '#a09e313d',
+                        marginTop: 10,
+                      },
+                    ]}
+                    onPress={async () => {
+                      Alert
+                        .alert(
+                          'solicitação de troca',
+                          'deseja solicitar a troca?',
+                          [
+                            {
+                              text: 'sim',
+                              style: 'destructive',
+                              onPress: () => {
+                                this._changeRequest()
+                                  .then(() => {
+                                    navigation.navigate('Home')
+                                  })
+                              }
+                            },
+                            {
+                              text: 'não',
+                              style: 'cancel'
+                            }
+                          ]
+                        )
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 18,
+                        textAlign: 'center',
+                        color: '#fff',
+                      }}
+                    >
+                      não posso no dia
+                    </Text>
+                  </TouchableOpacity>
+                )
               }
             </ScrollView>
           </View>
