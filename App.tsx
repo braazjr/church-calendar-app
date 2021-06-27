@@ -28,6 +28,7 @@ import HomeScreen from './src/screens/home/Home';
 import MinisterRegister from './src/screens/minister/register/MinisterRegister';
 import ManagerUsers from './src/screens/minister/register/ManageUsers';
 import ChangeRequestsScreen from './src/screens/change-requests/change-requests-screen';
+import { LocaleConfig } from 'react-native-calendars';
 
 //  const Section: React.FC<{
 //    title: string;
@@ -114,7 +115,16 @@ import ChangeRequestsScreen from './src/screens/change-requests/change-requests-
 //    },
 //  });
 
-//  export default App;
+//  export default App;import {LocaleConfig} from 'react-native-calendars';
+
+LocaleConfig.locales['pt-BR'] = {
+  monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+  monthNamesShort: ['Jan.','Fev.','Mar.','Abr.','Mai.','Jun','Jul.','Ago.','Set.','Out.','Nov.','Dez.'],
+  dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
+  dayNamesShort: ['Dom.','Seg.','Ter.','Qua.','Qui.','Sex.','Sab.'],
+  today: 'Hoje'
+};
+LocaleConfig.defaultLocale = 'pt-BR';
 
 export default class App extends Component {
   state = {
