@@ -5,22 +5,24 @@ import {
   ScrollView,
   Text,
   Dimensions,
-  Platform,
 } from 'react-native';
 
-import CalendarStrip from 'react-native-calendar-strip';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import moment from 'moment';
 import firestore from '@react-native-firebase/firestore';
 import * as lodash from 'lodash';
+import { CalendarList, MultiDotMarking } from 'react-native-calendars';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 import { Task } from '../../components/Task';
 import { styles } from './styles'
 import { getLoggedUser, logoff } from '../../services/authentication';
+import LoadingComponent from '../../components/loading.component';
+import { mainStyle } from '../../../config/styles';
 
 export default class HomeScreen extends Component {
   state = {
+    visibleHeight: Dimensions.get('window').height,
     datesWhitelist: [
       {
         start: moment().subtract(365, 'days'),
@@ -28,23 +30,39 @@ export default class HomeScreen extends Component {
       },
     ],
     todoList: [],
-    markedDate: [],
+    markedDates: [],
     currentDate: moment().format('YYYY-MM-DD'),
     isModalVisible: false,
     selectedTask: null,
     isDateTimePickerVisible: false,
     loggedUser: null,
     selectedDate: moment(),
-    isLoading: true,
+    isLoading: false,
   };
 
   async componentDidMount() {
+    this.setState({ isLoading: true })
+
     const loggedUser = await getLoggedUser()
     this.setState({ loggedUser })
 
     const { currentDate } = this.state;
     this._getTasks(moment(currentDate));
   }
+
+  _keyboardDidShow = e => {
+    this.setState({
+      keyboardHeight: e.endCoordinates.height,
+      visibleHeight:
+        Dimensions.get('window').height - e.endCoordinates.height - 30,
+    });
+  };
+
+  _keyboardDidHide = () => {
+    this.setState({
+      visibleHeight: Dimensions.get('window').height,
+    });
+  };
 
   _handleModalVisible = () => {
     const { isModalVisible } = this.state;
@@ -61,7 +79,7 @@ export default class HomeScreen extends Component {
     const { loggedUser } = this.state
 
     try {
-      let markDot = [];
+      let markDot = {};
       let collection;
 
       if (loggedUser.ministersLead && loggedUser.ministersLead.length > 0) {
@@ -75,7 +93,7 @@ export default class HomeScreen extends Component {
       }
 
       collection
-        .onSnapshot(observer => {
+        .onSnapshot(async observer => {
           let tasks = observer.docs
             .map(doc => ({ id: doc.id, ...doc.data() }))
             .map(doc => {
@@ -90,16 +108,23 @@ export default class HomeScreen extends Component {
             .map(task => task.date)
           const uniqDates = lodash.uniq(dates)
 
-          markDot = uniqDates
-            .map(ud => ({
-              date: ud,
+          markDot[`${currentDate.format('yyyy-MM-DD')}`] = {
+            selected: true
+          }
+          for await (const date of uniqDates) {
+            markDot[`${moment(date).format('yyyy-MM-DD')}`] = {
               dots: tasks
-                .filter(task => task.date == ud)
-                .map(task => ({ key: task.id, color: task.minister.color, selectedDotColor: task.minister.color }))
-            }))
+                .filter(task => task.date == date)
+                .map(task => ({
+                  key: task.id,
+                  color: task.minister.color,
+                })),
+              selected: this._formatDateToCompare(date) == currentDate.format('YYYY-MM-DD')
+            } as MultiDotMarking
+          }
 
           this.setState({
-            markedDate: markDot,
+            markedDates: markDot,
             todoList: tasksByDate,
             isLoading: false,
           });
@@ -134,24 +159,20 @@ export default class HomeScreen extends Component {
     this._hideDateTimePicker();
   };
 
-  handleAlarmSet = () => {
-    const { selectedTask } = this.state;
-    const prevSelectedTask = { ...selectedTask };
-    prevSelectedTask.alarm.isOn = !prevSelectedTask.alarm.isOn;
-    this.setState({
-      selectedTask: prevSelectedTask,
-    });
-  };
-
   logoff() {
     logoff()
+  }
+
+  hasTodayTask() {
+    const { loggedUser, todoList } = this.state
+    return todoList.filter(task => task.ministry.id == loggedUser.id).length > 0
   }
 
   render() {
     const {
       state: {
-        datesWhitelist,
-        markedDate,
+        visibleHeight,
+        markedDates,
         todoList,
         isModalVisible,
         selectedTask,
@@ -178,214 +199,226 @@ export default class HomeScreen extends Component {
             />
           </Task>
         )}
-        <View
-          style={{
-            flex: 1,
-            paddingTop: 50,
-            backgroundColor: '#32a19b'
-          }}
+
+        <LoadingComponent
+          isLoading={isLoading}
         >
-          {
-            !isLoading &&
-            <View
-              style={{
-                backgroundColor: '#fff',
-                // paddingTop: 20,
-              }}
-            >
-              <CalendarStrip
-                // ref={ref => {
-                //   this.calenderRef = ref;
-                // }}
-                calendarAnimation={{ type: 'sequence', duration: 30 }}
-                // daySelectionAnimation={{
-                //   // type: 'background',
-                //   duration: 200,
-                //   highlightColor: '#ffffff',
-                // }}
-                style={{
-                  height: 150,
-                  // marginBottom: 10,
-                  // borderBottomWidth: 3,
-                  borderBottomEndRadius: 25,
-                  borderBottomStartRadius: 25,
-                  // borderColor: '#32a19b',
-                  backgroundColor: '#32a19b'
-                }}
-                calendarHeaderStyle={{ color: '#fff' }}
-                dateNumberStyle={{ color: '#fff', paddingTop: 10 }}
-                dateNameStyle={{ color: '#fff' }}
-                highlightDateNumberStyle={{
-                  color: '#32a19b',
-                  backgroundColor: '#fff',
-                  marginTop: 10,
-                  height: 35,
-                  width: 35,
-                  textAlign: 'center',
-                  borderRadius: 17.5,
-                  overflow: 'hidden',
-                  paddingTop: 6,
-                  fontWeight: '400',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-                highlightDateNameStyle={{ color: '#fff' }}
-                disabledDateNameStyle={{ color: 'grey' }}
-                disabledDateNumberStyle={{ color: 'grey', paddingTop: 10 }}
-                datesWhitelist={datesWhitelist}
-                iconLeft={require('../../../assets/left-arrow.png')}
-                iconRight={require('../../../assets/right-arrow.png')}
-                iconContainer={{ flex: 0.1 }}
-                markedDates={markedDate}
-                selectedDate={selectedDate}
-                onDateSelected={date => {
-                  this._getTasks(date);
-                  this.setState({
-                    currentDate: this._formatDateToCompare(date),
-                  });
-                }}
-              />
-            </View>
-          }
-          {
-            loggedUser?.ministersLead && loggedUser.ministersLead.length > 0 &&
-            <TouchableOpacity
-              onPress={() =>
-                navigation.navigate('CreateTask', {
-                  updateCurrentTask: this._getTasks,
-                  currentDate,
-                  // createNewCalendar: this._createNewCalendar,
-                })
-              }
-              style={styles.viewTask}
-            >
-              <Icon
-                name="plus"
-                color={'#fff'}
-                size={30}
-                style={{
-                  paddingLeft: 2,
-                  paddingTop: 2,
-                  alignSelf: 'center',
-                }}
-              />
-            </TouchableOpacity>
-          }
-          <View style={{ backgroundColor: '#fff', paddingTop: 20 }}>
-            <TouchableOpacity
-              style={{
-                width: 'auto',
-                height: 'auto',
-                alignSelf: 'flex-end',
-                borderRadius: 5,
-                backgroundColor: '#32a19b',
-                marginRight: 30,
-                marginTop: -10
-              }}
-              onPress={() => this.logoff()}
-            >
-              <Text
-                style={{
-                  fontSize: 14,
-                  textAlign: 'center',
-                  paddingVertical: 5,
-                  paddingHorizontal: 10,
-                  color: '#fff'
-                }}
+          <View
+            style={{
+              height: visibleHeight,
+              marginTop: 50,
+            }}
+          >
+            {
+              loggedUser?.ministersLead && loggedUser.ministersLead.length > 0 &&
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate('CreateTask', {
+                    updateCurrentTask: this._getTasks,
+                    currentDate,
+                    // createNewCalendar: this._createNewCalendar,
+                  })
+                }
+                style={styles.viewTask}
               >
-                sair
-                </Text>
-            </TouchableOpacity>
-            <View
-              style={{
-                width: '100%',
-                height: Dimensions.get('window').height - 170,
+                <Icon
+                  name="plus"
+                  color={'#fff'}
+                  size={30}
+                  style={{
+                    paddingLeft: 2,
+                    paddingTop: 2,
+                    alignSelf: 'center',
+                    // paddingTop: 20,
+                  }}
+                />
+              </TouchableOpacity>
+            }
+            <ScrollView
+              contentContainerStyle={{
+                paddingBottom: 100,
               }}
             >
-              <ScrollView
-                contentContainerStyle={{
-                  paddingBottom: 20,
-                }}
-              >
-                {todoList.map(item => (
-                  <TouchableOpacity
-                    onPress={() => {
-                      navigation.navigate('CreateTask', {
-                        updateCurrentTask: this._getTasks,
-                        currentDate,
-                        // createNewCalendar: this._createNewCalendar,
-                        itemSaved: {
-                          ...item,
-                          // ministerData: item.minister,
-                        }
-                      })
+              <View style={{
+                width: 350,
+                height: 350,
+                alignSelf: 'center',
+                borderBottomWidth: 2,
+                borderBottomColor: mainStyle.primaryColor,
+              }}>
+                <CalendarList
+                  style={{
+                    width: 350,
+                    height: 350,
+                  }}
+                  current={moment(selectedDate).format('yy-MM-DD')}
+                  horizontal
+                  pastScrollRange={0}
+                  pagingEnabled
+                  calendarWidth={350}
+                  onDayPress={day => {
+                    this._getTasks(moment(day.dateString));
+                    this.setState({
+                      currentDate: this._formatDateToCompare(day),
+                    });
+                  }}
+                  monthFormat="yyyy MMMM"
+                  hideArrows
+                  theme={{
+                    selectedDayBackgroundColor: '#32a19b',
+                    selectedDayTextColor: '#ffffff',
+                    todayTextColor: '#32a19b',
+                    calendarBackground: 'transparent',
+                    textDisabledColor: '#d9dbe0',
+                  }}
+                  markingType={'multi-dot'}
+                  markedDates={markedDates as any}
+                />
+              </View>
+              <View>
+                <View style={{ backgroundColor: '#fff', paddingTop: 20 }}>
+                  {/* <TouchableOpacity
+                    style={{
+                      width: 'auto',
+                      height: 'auto',
+                      alignSelf: 'flex-end',
+                      borderRadius: 5,
+                      backgroundColor: '#32a19b',
+                      marginRight: 30,
+                      marginTop: -10
                     }}
-                    key={item.id}
-                    style={[styles.taskListContent, { borderRightColor: item.minister.color, borderRightWidth: 10 }]}
+                    onPress={() => this.logoff()}
                   >
-                    <View
+                    <Text
                       style={{
-                        marginLeft: 13,
+                        fontSize: 14,
+                        textAlign: 'center',
+                        paddingVertical: 5,
+                        paddingHorizontal: 10,
+                        color: '#fff'
                       }}
                     >
-                      <View
-                        style={{
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                        }}
-                      >
-                        <View
-                          style={{
-                            height: 12,
-                            width: 12,
-                            borderRadius: 6,
-                            backgroundColor: item.minister.color,
-                            marginRight: 8,
+                      logout
+                </Text>
+                  </TouchableOpacity> */}
+                  <View
+                    style={{
+                      width: '100%',
+                      height: Dimensions.get('window').height - 170,
+                    }}
+                  >
+                    <ScrollView
+                      contentContainerStyle={{
+                        paddingBottom: 20,
+                      }}
+                    >
+                      {
+                        (todoList.length == 0 || !this.hasTodayTask()) &&
+                        (
+                          <View
+                            style={[
+                              styles.taskListContent,
+                              {
+                                alignContent: 'center',
+                                flexDirection: 'column',
+                                padding: 20,
+                                backgroundColor: 'rgba(230, 166, 45, 0.5)',
+                              }]}
+                          >
+                            <Text
+                              style={{
+                                flex: 1,
+                                color: 'black',
+                                fontSize: 18,
+                                fontWeight: '700',
+                              }}
+                            >
+                              pode descansar!
+                          </Text>
+                            <Text
+                              style={{
+                                flex: 1,
+                                color: 'black',
+                                fontSize: 14,
+                              }}
+                            >
+                              nesse dia você está de folga :)
+                            </Text>
+                          </View>
+                        )
+                      }
+                      {todoList.map(item => (
+                        <TouchableOpacity
+                          onPress={() => {
+                            navigation.navigate('CreateTask', {
+                              updateCurrentTask: this._getTasks,
+                              currentDate,
+                              itemSaved: {
+                                ...item,
+                              }
+                            })
                           }}
-                        />
-                        <Text
-                          style={{
-                            color: '#fff',
-                            fontSize: 20,
-                            fontWeight: '700',
-                          }}
+                          key={item.id}
+                          style={[styles.taskListContent, { borderRightColor: item.minister.color, borderRightWidth: 10 }]}
                         >
-                          {item.minister.name} - {moment(item.date).format('HH:mm')}
-                        </Text>
-                      </View>
-                      <View>
-                        <View
-                          style={{
-                            flexDirection: 'row',
-                            marginLeft: 10,
-                            marginTop: 10
-                          }}
-                        >
-                          <Text
+                          <View
                             style={{
-                              color: '#fff',
-                              fontSize: 14,
+                              marginLeft: 13,
                             }}
                           >
-                            {item.ministry.name} / {item.functions.join(' & ')}
-                          </Text>
-                        </View>
-                      </View>
-                    </View>
-                    {/* <View
-                      style={{
-                        height: 80,
-                        width: 5,
-                        backgroundColor: item.minister.color,
-                        borderRadius: 5,
-                      }}
-                    /> */}
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            </View>
+                            <View
+                              style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                              }}
+                            >
+                              <View
+                                style={{
+                                  height: 12,
+                                  width: 12,
+                                  borderRadius: 6,
+                                  backgroundColor: item.minister.color,
+                                  marginRight: 8,
+                                }}
+                              />
+                              <Text
+                                style={{
+                                  color: '#fff',
+                                  fontSize: 18,
+                                  fontWeight: '700',
+                                }}
+                              >
+                                {item.minister.name} - {moment(item.date).format('HH:mm')}
+                              </Text>
+                            </View>
+                            <View>
+                              <View
+                                style={{
+                                  flexDirection: 'row',
+                                  marginLeft: 10,
+                                  marginTop: 10
+                                }}
+                              >
+                                <Text
+                                  style={{
+                                    color: '#fff',
+                                    fontSize: 14,
+                                  }}
+                                >
+                                  {item.ministry.name} / {item.functions.join(' & ')}
+                                </Text>
+                              </View>
+                            </View>
+                          </View>
+                        </TouchableOpacity>
+                      ))}
+                    </ScrollView>
+                  </View>
+                </View>
+              </View>
+            </ScrollView>
           </View>
-        </View>
+        </LoadingComponent>
       </>
     );
   }

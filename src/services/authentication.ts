@@ -19,7 +19,7 @@ const signInWithGoogle = async () => {
 
         if (!idToken) {
             console.error('\nSIGN_IN_WITH_GOOGLE_ERROR\n')
-            return
+            return Promise.reject("SIGN_IN_WITH_GOOGLE_ERROR")
         }
 
         const googleCredential = auth.GoogleAuthProvider.credential(idToken);
@@ -27,7 +27,7 @@ const signInWithGoogle = async () => {
 
         checkUserFromFirestore(userCredential.user)
 
-        return userCredential
+        return true
     } catch (error) {
         Alert.alert(error)
     }

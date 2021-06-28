@@ -5,7 +5,6 @@ import {
   ScrollView,
   Text,
   Dimensions,
-  Platform,
 } from 'react-native';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -13,13 +12,16 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { styles } from './styles'
 import { getMinisters } from '../../services/minister';
 import { getUsersFromMinister } from '../../services/user';
+import LoadingComponent from '../../components/loading.component';
 
 export default class MinisterListScreen extends Component {
   state = {
+    isLoading: false,
     ministers: []
   };
 
   componentDidMount() {
+    this.setState({ isLoading: true })
     getMinisters()
       .onSnapshot(observer => {
         Promise.all(observer.docs
@@ -29,7 +31,8 @@ export default class MinisterListScreen extends Component {
           }))
           .then(data => {
             this.setState({
-              ministers: data
+              isLoading: false,
+              ministers: data,
             })
           })
       });
@@ -38,98 +41,102 @@ export default class MinisterListScreen extends Component {
   render() {
     const {
       state: {
-        ministers
+        isLoading,
+        ministers,
       },
       props: { navigation },
     } = this;
 
     return (
       <>
-        <View
-          style={{
-            flex: 1,
-            paddingTop: Platform.OS == 'android' ? 26 :  50,
-            backgroundColor: '#fff'
-          }}
+        <LoadingComponent
+          isLoading={isLoading}
         >
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate('MinisterRegister', {
-              })
-            }}
-            style={styles.view}
-          >
-            <Icon
-              name="plus"
-              color={'#fff'}
-              size={30}
-              style={{
-                paddingLeft: 2,
-                paddingTop: 2,
-                alignSelf: 'center',
-              }}
-            />
-          </TouchableOpacity>
           <View
             style={{
-              width: '100%',
-              height: Dimensions.get('window').height,
-              marginTop: 10,
+              flex: 1,
+              paddingTop: 50,
+              backgroundColor: '#fff'
             }}
           >
-            <Text style={styles.newMinister}>ministérios</Text>
-            <ScrollView
-              contentContainerStyle={{
-                paddingBottom: Platform.OS == 'android' ? 100 : 180,
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('MinisterRegister', {
+                })
+              }}
+              style={styles.view}
+            >
+              <Icon
+                name="plus"
+                color={'#fff'}
+                size={30}
+                style={{
+                  paddingLeft: 2,
+                  paddingTop: 2,
+                  alignSelf: 'center',
+                }}
+              />
+            </TouchableOpacity>
+            <View
+              style={{
+                width: '100%',
+                height: Dimensions.get('window').height,
+                marginTop: 10,
               }}
             >
-              {ministers.map(item => (
-                <TouchableOpacity
-                  onPress={() => {
-                    navigation.navigate('MinisterRegister', {
-                      itemSaved: {
-                        ...item,
-                      }
-                    })
-                  }}
-                  key={item.id}
-                  style={[styles.listContent, { borderRightColor: item.color, borderRightWidth: 10 }]}
-                >
-                  <View
-                    style={{
-                      marginLeft: 13,
+              <Text style={styles.newMinister}>ministérios</Text>
+              <ScrollView
+                contentContainerStyle={{
+                  paddingBottom: '30%',
+                }}
+              >
+                {ministers.map(item => (
+                  <TouchableOpacity
+                    onPress={() => {
+                      navigation.navigate('MinisterRegister', {
+                        itemSaved: {
+                          ...item,
+                        }
+                      })
                     }}
+                    key={item.id}
+                    style={[styles.listContent, { borderRightColor: item.color, borderRightWidth: 10 }]}
                   >
                     <View
                       style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
+                        marginLeft: 13,
                       }}
                     >
-                      <Text
+                      <View
                         style={{
-                          color: '#fff',
-                          fontSize: 16,
-                          fontWeight: '700',
+                          flexDirection: 'row',
+                          alignItems: 'center',
                         }}
                       >
-                        {item.name}
-                      </Text>
-                    </View>
-                    <View>
-                      <Text
-                        style={{
-                          color: '#fff',
-                          fontSize: 14,
-                          marginLeft: 10,
-                          marginTop: 10
-                        }}
-                      >
-                        {(item.users || []).length} ministros
+                        <Text
+                          style={{
+                            color: '#fff',
+                            fontSize: 16,
+                            fontWeight: '700',
+                          }}
+                        >
+                          {item.name}
+                        </Text>
+                      </View>
+                      <View>
+                        <Text
+                          style={{
+                            color: '#fff',
+                            fontSize: 14,
+                            marginLeft: 10,
+                            marginTop: 10
+                          }}
+                        >
+                          {(item.users || []).length} ministros
                             </Text>
+                      </View>
                     </View>
-                  </View>
-                  {/* <View
+                    {/* <View
                     style={{
                       height: 70,
                       width: 5,
@@ -137,11 +144,12 @@ export default class MinisterListScreen extends Component {
                       borderRadius: 5,
                     }}
                   /> */}
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
           </View>
-        </View>
+        </LoadingComponent>
       </>
     );
   }

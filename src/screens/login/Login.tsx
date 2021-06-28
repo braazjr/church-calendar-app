@@ -6,68 +6,80 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { styles } from "./styles";
 import { mainStyle } from "../../../config/styles";
 import { signInWithApple, signInWithGoogle } from "../../services/authentication";
+import LoadingComponent from "../../components/loading.component";
 
 export default class LoginScreen extends Component {
     state = {
+        isLoading: false
     }
 
     render() {
+        const { isLoading } = this.state
+
         return (
             <>
-                <View
-                    style={{
-                        flex: 1,
-                        paddingTop: StatusBar.currentHeight,
-                        backgroundColor: 'white'
-                    }}
+                <LoadingComponent
+                    isLoading={isLoading}
                 >
-                    <View style={styles.header}>
-                        <Image
-                            source={require('../../../assets/logo_branco.png')}
-                            style={{
-                                width: '60%',
-                                height: '60%',
-                                margin: 20
-                            }}
-                        />
-                    </View>
-                    <Animatable.View
-                        animation="fadeInUpBig"
-                        style={[styles.footer, {
-                            backgroundColor: mainStyle.primaryColor
-                        }]}
+                    <View
+                        style={{
+                            flex: 1,
+                            paddingTop: StatusBar.currentHeight,
+                            backgroundColor: 'white'
+                        }}
                     >
-                        <TouchableOpacity
-                            onPress={() => signInWithGoogle()}
-                            style={[styles.signIn, {
-                                backgroundColor: mainStyle.secondayColor,
-                                marginTop: 15,
-                                marginBottom: 15,
+                        <View style={styles.header}>
+                            <Image
+                                source={require('../../../assets/logo_branco.png')}
+                                style={{
+                                    width: '60%',
+                                    height: '60%',
+                                    margin: 20
+                                }}
+                            />
+                        </View>
+                        <Animatable.View
+                            animation="fadeInUpBig"
+                            style={[styles.footer, {
+                                backgroundColor: mainStyle.primaryColor
                             }]}
                         >
-                            <Icon
-                                name="google"
-                                size={20}
-                                color={mainStyle.primaryColor} />
-                        </TouchableOpacity>
-                        {
-                            Platform.OS == 'ios' &&
-                            (
-                                <TouchableOpacity
-                                    onPress={() => signInWithApple()}
-                                    style={[styles.signIn, {
-                                        backgroundColor: mainStyle.secondayColor,
-                                    }]}
-                                >
-                                    <Icon
-                                        name="apple"
-                                        size={20}
-                                        color={mainStyle.primaryColor} />
-                                </TouchableOpacity>
-                            )
-                        }
-                    </Animatable.View>
-                </View>
+                            <TouchableOpacity
+                                onPress={() => {
+                                    this.setState({ isLoading: true })
+                                    signInWithGoogle()
+                                        .finally(() => setTimeout(() => this.setState({ isLoading: false }), 2000))
+                                }}
+                                style={[styles.signIn, {
+                                    backgroundColor: mainStyle.secondayColor,
+                                    marginTop: 15,
+                                    marginBottom: 15,
+                                }]}
+                            >
+                                <Icon
+                                    name="google"
+                                    size={20}
+                                    color={mainStyle.primaryColor} />
+                            </TouchableOpacity>
+                            {
+                                Platform.OS == 'ios' &&
+                                (
+                                    <TouchableOpacity
+                                        onPress={() => signInWithApple()}
+                                        style={[styles.signIn, {
+                                            backgroundColor: mainStyle.secondayColor,
+                                        }]}
+                                    >
+                                        <Icon
+                                            name="apple"
+                                            size={20}
+                                            color={mainStyle.primaryColor} />
+                                    </TouchableOpacity>
+                                )
+                            }
+                        </Animatable.View>
+                    </View>
+                </LoadingComponent>
             </>
         )
     }

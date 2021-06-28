@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
     taskListContent: {
@@ -16,14 +16,14 @@ export const styles = StyleSheet.create({
       },
       shadowRadius: 5,
       shadowOpacity: 0.2,
-      elevation: 3,
+      elevation: Platform.OS == 'android' ? 0 : 3,
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
     },
     viewTask: {
       position: 'absolute',
-      bottom: 40,
+      bottom: '15%',
       right: 17,
       height: 60,
       width: 60,
@@ -31,7 +31,7 @@ export const styles = StyleSheet.create({
       borderRadius: 30,
       justifyContent: 'center',
       alignItems: 'center',
-      shadowColor: '#32a19b',
+      shadowColor: '#fff',
       shadowOffset: {
         width: 0,
         height: 5,
