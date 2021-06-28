@@ -19,6 +19,7 @@ import { styles } from './styles'
 import { getLoggedUser, logoff } from '../../services/authentication';
 import LoadingComponent from '../../components/loading.component';
 import { mainStyle } from '../../../config/styles';
+import { hasNotch } from '../../utils/device.util';
 
 export default class HomeScreen extends Component {
   state = {
@@ -205,35 +206,9 @@ export default class HomeScreen extends Component {
         >
           <View
             style={{
-              height: visibleHeight,
-              marginTop: 50,
+              marginTop: hasNotch() ? 50 : 20,
             }}
           >
-            {
-              loggedUser?.ministersLead && loggedUser.ministersLead.length > 0 &&
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate('CreateTask', {
-                    updateCurrentTask: this._getTasks,
-                    currentDate,
-                    // createNewCalendar: this._createNewCalendar,
-                  })
-                }
-                style={styles.viewTask}
-              >
-                <Icon
-                  name="plus"
-                  color={'#fff'}
-                  size={30}
-                  style={{
-                    paddingLeft: 2,
-                    paddingTop: 2,
-                    alignSelf: 'center',
-                    // paddingTop: 20,
-                  }}
-                />
-              </TouchableOpacity>
-            }
             <ScrollView
               contentContainerStyle={{
                 paddingBottom: 100,
@@ -241,7 +216,6 @@ export default class HomeScreen extends Component {
             >
               <View style={{
                 width: 350,
-                height: 350,
                 alignSelf: 'center',
                 borderBottomWidth: 2,
                 borderBottomColor: mainStyle.primaryColor,
@@ -249,7 +223,6 @@ export default class HomeScreen extends Component {
                 <CalendarList
                   style={{
                     width: 350,
-                    height: 350,
                   }}
                   current={moment(selectedDate).format('yy-MM-DD')}
                   horizontal
@@ -277,34 +250,57 @@ export default class HomeScreen extends Component {
               </View>
               <View>
                 <View style={{ backgroundColor: '#fff', paddingTop: 20 }}>
-                  {/* <TouchableOpacity
-                    style={{
-                      width: 'auto',
-                      height: 'auto',
-                      alignSelf: 'flex-end',
-                      borderRadius: 5,
-                      backgroundColor: '#32a19b',
-                      marginRight: 30,
-                      marginTop: -10
-                    }}
-                    onPress={() => this.logoff()}
-                  >
-                    <Text
-                      style={{
-                        fontSize: 14,
-                        textAlign: 'center',
-                        paddingVertical: 5,
-                        paddingHorizontal: 10,
-                        color: '#fff'
-                      }}
-                    >
-                      logout
-                </Text>
-                  </TouchableOpacity> */}
+                  {
+                    loggedUser?.ministersLead && loggedUser.ministersLead.length > 0 &&
+                    (<View>
+                      {/* <TouchableOpacity
+                        style={[
+                          styles.createTaskButton,
+                          {
+                            backgroundColor: '#32a19b',
+                          },
+                        ]}
+                        onPress={() => this.logoff()}
+                      >
+                        <Text
+                          style={{
+                            fontSize: 18,
+                            textAlign: 'center',
+                            color: '#fff',
+                          }}
+                        >
+                          deslogar
+                      </Text>
+                      </TouchableOpacity> */}
+                      <TouchableOpacity
+                        style={[
+                          styles.createTaskButton,
+                          {
+                            backgroundColor: '#32a19b',
+                          },
+                        ]}
+                        onPress={async () => {
+                          navigation.navigate('CreateTask', {
+                            updateCurrentTask: this._getTasks,
+                            currentDate,
+                          })
+                        }}
+                      >
+                        <Text
+                          style={{
+                            fontSize: 18,
+                            textAlign: 'center',
+                            color: '#fff',
+                          }}
+                        >
+                          add uma escala
+                      </Text>
+                      </TouchableOpacity>
+                    </View>)
+                  }
                   <View
                     style={{
                       width: '100%',
-                      height: Dimensions.get('window').height - 170,
                     }}
                   >
                     <ScrollView
@@ -350,7 +346,8 @@ export default class HomeScreen extends Component {
                       {todoList.map(item => (
                         <TouchableOpacity
                           onPress={() => {
-                            navigation.navigate('CreateTask', {
+                            let destinationPage = loggedUser?.ministersLead && loggedUser.ministersLead.length > 0 ? 'CreateTask' : 'ViewTask'
+                            navigation.navigate(destinationPage, {
                               updateCurrentTask: this._getTasks,
                               currentDate,
                               itemSaved: {

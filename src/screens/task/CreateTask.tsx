@@ -23,6 +23,7 @@ import { getUsersFromMinister } from '../../services/user';
 import { deleteTask, updateTask } from '../../services/task';
 import { createChangeRequest } from '../../services/change-requests.service';
 import { Task } from '../../models/task-model';
+import { hasNotch } from '../../utils/device.util';
 
 const { width: vw } = Dimensions.get('window');
 // moment().format('YYYY/MM/DD')
@@ -311,7 +312,7 @@ export default class CreateTask extends Component {
           <View
             style={{
               height: Platform.OS == 'android' ? '100%' : visibleHeight,
-              paddingTop: Platform.OS == 'android' ? 76 : 80,
+              paddingTop: Platform.OS == 'android' ? 76 : hasNotch() ? 80 : 50,
             }}
           >
             <ScrollView

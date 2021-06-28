@@ -29,6 +29,7 @@ import MinisterRegister from './src/screens/minister/register/MinisterRegister';
 import ManagerUsers from './src/screens/minister/register/ManageUsers';
 import ChangeRequestsScreen from './src/screens/change-requests/change-requests-screen';
 import { LocaleConfig } from 'react-native-calendars';
+import ViewTaskScreen from './src/screens/task/ViewTask.screen';
 
 //  const Section: React.FC<{
 //    title: string;
@@ -118,10 +119,10 @@ import { LocaleConfig } from 'react-native-calendars';
 //  export default App;import {LocaleConfig} from 'react-native-calendars';
 
 LocaleConfig.locales['pt-BR'] = {
-  monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
-  monthNamesShort: ['Jan.','Fev.','Mar.','Abr.','Mai.','Jun','Jul.','Ago.','Set.','Out.','Nov.','Dez.'],
-  dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
-  dayNamesShort: ['Dom.','Seg.','Ter.','Qua.','Qui.','Sex.','Sab.'],
+  monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+  monthNamesShort: ['Jan.', 'Fev.', 'Mar.', 'Abr.', 'Mai.', 'Jun', 'Jul.', 'Ago.', 'Set.', 'Out.', 'Nov.', 'Dez.'],
+  dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
+  dayNamesShort: ['Dom.', 'Seg.', 'Ter.', 'Qua.', 'Qui.', 'Sex.', 'Sab.'],
   today: 'Hoje'
 };
 LocaleConfig.defaultLocale = 'pt-BR';
@@ -196,7 +197,7 @@ export default class App extends Component {
             />
           }
         })}>
-        <Tab.Screen name={'calendário'} component={HomeScreen} initialParams={{ setIsLoading: this.setIsLoading }} />
+        <Tab.Screen name={'calendário'} component={HomeScreen} />
         {isLeader && (<Tab.Screen name={'ministérios'} component={MinisterListScreen} />)}
         <Tab.Screen name={'trocas'} component={ChangeRequestsScreen} />
       </Tab.Navigator>
@@ -217,6 +218,7 @@ export default class App extends Component {
               <Stack.Navigator headerMode="none" >
                 <Stack.Screen name={'Home'} component={this.TabNavigators} />
                 <Stack.Screen name={'CreateTask'} component={CreateTask} />
+                <Stack.Screen name={'ViewTask'} component={ViewTaskScreen} />
                 <Stack.Screen name={'MinisterRegister'} component={MinisterRegister} />
                 <Stack.Screen name={'ManageUsers'} component={ManagerUsers} />
               </Stack.Navigator>

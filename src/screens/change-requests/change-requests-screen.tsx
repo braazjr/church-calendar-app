@@ -16,6 +16,7 @@ import { getLoggedUser } from '../../services/authentication';
 import { mainStyle } from '../../../config/styles';
 import { deleteChangeRequest, doneChangeRequest, getChangeRequests } from '../../services/change-requests.service';
 import LoadingComponent from '../../components/loading.component';
+import { hasNotch } from '../../utils/device.util';
 
 export default class ChangeRequestsScreen extends Component {
   state = {
@@ -59,7 +60,7 @@ export default class ChangeRequestsScreen extends Component {
           <View
             style={{
               flex: 1,
-              paddingTop: 50,
+              marginTop: hasNotch() ? 50 : 20,
               backgroundColor: '#fff'
             }}
           >
@@ -248,18 +249,23 @@ export default class ChangeRequestsScreen extends Component {
                         >
                           {item.task.minister.name}
                         </Text>
-                        <Text
-                          style={{
-                            color: item.done ? '#0000006b' : '#fff',
-                            fontSize: 16,
-                            fontWeight: '700',
-                            textAlign: 'right',
-                            width: '100%',
-                            margin: 3,
-                          }}
-                        >
-                          [{item.task.functions.join(' & ')}]
-                      </Text>
+                        {
+                          item.task?.functions.length > 0 &&
+                          (
+                            <Text
+                              style={{
+                                color: item.done ? '#0000006b' : '#fff',
+                                fontSize: 16,
+                                fontWeight: '700',
+                                textAlign: 'right',
+                                width: '100%',
+                                margin: 3,
+                              }}
+                            >
+                              [{item.task.functions.join(' & ')}]
+                            </Text>
+                          )
+                        }
                       </View>
                       <View>
                         <Text

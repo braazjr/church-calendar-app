@@ -15,6 +15,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 
 import { deleteMinister, updateMinister } from '../../../services/minister';
 import { styles } from './styles';
+import { hasNotch } from '../../../utils/device.util';
 
 const { width: vw } = Dimensions.get('window');
 
@@ -129,7 +130,7 @@ export default class MinisterRegister extends Component {
           <View
             style={{
               height: visibleHeight,
-              paddingTop: Platform.OS == 'android' ? 26 :  50,
+              paddingTop: Platform.OS == 'android' ? 26 : hasNotch() ? 50 : 15,
             }}
           >
             <ScrollView

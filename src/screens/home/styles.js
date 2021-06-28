@@ -129,4 +129,12 @@ export const styles = StyleSheet.create({
       fontWeight: '700',
       marginBottom: 30
     },
+    createTaskButton: {
+      width: '80%',
+      height: 32,
+      alignSelf: 'center',
+      borderRadius: 5,
+      justifyContent: 'center',
+      marginBottom: 10
+    },
   });

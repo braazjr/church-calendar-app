@@ -13,6 +13,8 @@ import { styles } from './styles'
 import { getMinisters } from '../../services/minister';
 import { getUsersFromMinister } from '../../services/user';
 import LoadingComponent from '../../components/loading.component';
+import { hasNotch } from '../../utils/device.util';
+import { getLoggedUser } from '../../services/authentication';
 
 export default class MinisterListScreen extends Component {
   state = {
@@ -20,11 +22,13 @@ export default class MinisterListScreen extends Component {
     ministers: []
   };
 
-  componentDidMount() {
+  async componentDidMount() {
     this.setState({ isLoading: true })
+    const loggedUSer = await getLoggedUser()
     getMinisters()
       .onSnapshot(observer => {
         Promise.all(observer.docs
+          .filter(doc => loggedUSer.ministersLead.includes(doc.data().id) || loggedUSer.email == 'elias.brazjunior@gmail.com')
           .map(async doc => {
             const users = await getUsersFromMinister(doc.id)
             return { id: doc.id, ...doc.data(), users }
@@ -55,7 +59,7 @@ export default class MinisterListScreen extends Component {
           <View
             style={{
               flex: 1,
-              paddingTop: 50,
+              marginTop: hasNotch() ? 50 : 20,
               backgroundColor: '#fff'
             }}
           >
