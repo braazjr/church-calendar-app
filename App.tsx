@@ -137,10 +137,13 @@ export default class App extends Component {
   async componentDidMount() {
     auth()
       .onAuthStateChanged(async user => {
+        console.info('user', user)
+        user && user.reload()
+
         const isLogged = user != null
         checkFCMPermissions(isLogged)
         const leader = isLogged ? await isLeader() : false
-        console.log('leader', leader)
+        console.info('leader', leader)
 
         this.setState({ isLogged, user: isLogged ? user : null, isLeader: leader })
         SplashScreen.hide()

@@ -65,7 +65,11 @@ export default class LoginScreen extends Component {
                                 Platform.OS == 'ios' &&
                                 (
                                     <TouchableOpacity
-                                        onPress={() => signInWithApple()}
+                                        onPress={() => {
+                                            this.setState({ isLoading: true })
+                                            signInWithApple()
+                                                .finally(() => setTimeout(() => this.setState({ isLoading: false }), 2000))
+                                        }}
                                         style={[styles.signIn, {
                                             backgroundColor: mainStyle.secondayColor,
                                         }]}

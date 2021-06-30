@@ -81,15 +81,14 @@ export default class HomeScreen extends Component {
 
     try {
       let markDot = {};
-      let collection;
+      let collection = firestore()
+        .collection('tasks') as any;
 
-      if (loggedUser.ministersLead && loggedUser.ministersLead.length > 0) {
-        collection = firestore()
-          .collection('tasks')
+      if (loggedUser.id && loggedUser.ministersLead && loggedUser.ministersLead.length > 0) {
+        collection = collection
           .where('minister.id', 'in', loggedUser.ministersLead)
-      } else {
-        collection = firestore()
-          .collection('tasks')
+      } else if (loggedUser.id) {
+        collection = collection
           .where('ministry.id', '==', loggedUser.id)
       }
 
@@ -251,9 +250,9 @@ export default class HomeScreen extends Component {
               <View>
                 <View style={{ backgroundColor: '#fff', paddingTop: 20 }}>
                   {
-                    loggedUser?.ministersLead && loggedUser.ministersLead.length > 0 &&
+                    loggedUser && loggedUser.id &&
                     (<View>
-                      {/* <TouchableOpacity
+                      <TouchableOpacity
                         style={[
                           styles.createTaskButton,
                           {
@@ -271,7 +270,7 @@ export default class HomeScreen extends Component {
                         >
                           deslogar
                       </Text>
-                      </TouchableOpacity> */}
+                      </TouchableOpacity>
                       <TouchableOpacity
                         style={[
                           styles.createTaskButton,

@@ -36,7 +36,7 @@ const signInWithGoogle = async () => {
 const checkUserFromFirestore = async (user) => {
     firestore()
         .collection('users')
-        .where('email', '==', user.email)
+        .where('uid', '==', user.uid)
         .onSnapshot(observer => {
             let users = observer.docs
                 .map(doc => ({ id: doc.id, ...doc.data() }));
@@ -84,10 +84,16 @@ const getLoggedUser = async (): Promise<User> => {
             .where('uid', '==', uid)
             .get()
 
+        if (!userData || userData.docs.length == 0) {
+            return new User()
+        }
+
         const user = userData.docs[0].data()
         return { id: userData.docs[0].id, ...user } as User
     } catch (error) {
         console.error('GET_LOGGED_USER_ERROR', error)
+
+        throw 'GET_LOGGED_USER_ERROR'
     }
 }
 
