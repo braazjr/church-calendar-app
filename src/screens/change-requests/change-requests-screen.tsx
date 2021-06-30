@@ -32,7 +32,10 @@ export default class ChangeRequestsScreen extends Component {
 
   async loadChangeRequests() {
     getChangeRequests()
-      .then(async data => {
+      .onSnapshot(async observer => {
+        const data = (observer.docs || [])
+          .map(doc => ({ id: doc.id, ...doc.data() }))
+
         const loggedUser = await getLoggedUser()
 
         this.setState({
@@ -40,7 +43,7 @@ export default class ChangeRequestsScreen extends Component {
           loggedUserId: loggedUser.id,
           isLoading: false
         })
-      });
+      })
   }
 
   render() {

@@ -6,7 +6,7 @@ import { getTaskById, updateTask } from './task'
 
 const changeRequestCollection = firestore().collection('change-requests')
 
-export const getChangeRequests = async () => {
+export const getChangeRequests = (): any => {
     return new Promise(async (resolve) => {
         const user = await getLoggedUser()
         console.log('\nministers\n', user.ministers)
@@ -15,16 +15,8 @@ export const getChangeRequests = async () => {
             return changeRequestCollection
                 .where('task.minister.id', 'in', user.ministers || [])
                 // .where('task.date', '>=', firestore.Timestamp.now())
-                .onSnapshot(observer => {
-                    if (!observer) {
-                        resolve([])
-                    } else {
-                        resolve((observer.docs)
-                            .map(doc => ({ id: doc.id, ...doc.data() })))
-                    }
-                })
         } else {
-            return []
+            return changeRequestCollection
         }
     })
 }
