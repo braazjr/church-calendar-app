@@ -6,6 +6,7 @@ export class User {
     phoneNumber: string;
     photoUrl: string;
     tokens: string[];
-    uid: string;
+    // uid: string;
     ministersLead: string[];
+    isLeader?: boolean;
 }

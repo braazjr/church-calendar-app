@@ -14,7 +14,7 @@ import moment from 'moment';
 import { styles } from './styles'
 import { getLoggedUser } from '../../services/authentication';
 import { mainStyle } from '../../../config/styles';
-import { deleteChangeRequest, doneChangeRequest, getChangeRequests } from '../../services/change-requests.service';
+import { deleteChangeRequest, doneChangeRequest, changeRequestCollection } from '../../services/change-requests.service';
 import LoadingComponent from '../../components/loading.component';
 import { hasNotch } from '../../utils/device.util';
 
@@ -31,19 +31,28 @@ export default class ChangeRequestsScreen extends Component {
   }
 
   async loadChangeRequests() {
-    getChangeRequests()
-      .onSnapshot(async observer => {
-        const data = (observer.docs || [])
-          .map(doc => ({ id: doc.id, ...doc.data() }))
+    const user = await getLoggedUser()
 
-        const loggedUser = await getLoggedUser()
+    let collection = changeRequestCollection as any
 
-        this.setState({
-          changeRequests: data,
-          loggedUserId: loggedUser.id,
-          isLoading: false
-        })
+    if (user.ministers && user.ministers.length > 0) {
+      collection = collection
+        .where('task.minister.id', 'in', user.ministers || [])
+      // .where('task.date', '>=', firestore.Timestamp.now())
+    }
+
+    collection.onSnapshot(async observer => {
+      const data = (observer.docs || [])
+        .map(doc => ({ id: doc.id, ...doc.data() }))
+
+      const loggedUser = await getLoggedUser()
+
+      this.setState({
+        changeRequests: data,
+        loggedUserId: loggedUser.id,
+        isLoading: false
       })
+    })
   }
 
   render() {

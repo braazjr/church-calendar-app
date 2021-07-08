@@ -24,11 +24,11 @@ export default class MinisterListScreen extends Component {
 
   async componentDidMount() {
     this.setState({ isLoading: true })
-    const loggedUSer = await getLoggedUser()
+    const loggedUser = await getLoggedUser()
     getMinisters()
       .onSnapshot(observer => {
         Promise.all(observer.docs
-          .filter(doc => loggedUSer.ministersLead.includes(doc.data().id) || loggedUSer.email == 'elias.brazjunior@gmail.com')
+          .filter(doc => loggedUser.ministersLead.includes(doc.id))
           .map(async doc => {
             const users = await getUsersFromMinister(doc.id)
             return { id: doc.id, ...doc.data(), users }

@@ -31,7 +31,7 @@ export default class HomeScreen extends Component {
       },
     ],
     todoList: [],
-    markedDates: [],
+    markedDates: {},
     currentDate: moment().format('YYYY-MM-DD'),
     isModalVisible: false,
     selectedTask: null,
@@ -271,6 +271,11 @@ export default class HomeScreen extends Component {
                           deslogar
                       </Text>
                       </TouchableOpacity>
+                    </View>)
+                  }
+                  {
+                    loggedUser && loggedUser.id && loggedUser.isLeader &&
+                    (
                       <TouchableOpacity
                         style={[
                           styles.createTaskButton,
@@ -295,7 +300,7 @@ export default class HomeScreen extends Component {
                           add uma escala
                       </Text>
                       </TouchableOpacity>
-                    </View>)
+                    )
                   }
                   <View
                     style={{

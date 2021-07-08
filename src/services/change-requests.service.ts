@@ -4,22 +4,7 @@ import { Task } from '../models/task-model'
 import { getLoggedUser } from './authentication'
 import { getTaskById, updateTask } from './task'
 
-const changeRequestCollection = firestore().collection('change-requests')
-
-export const getChangeRequests = (): any => {
-    return new Promise(async (resolve) => {
-        const user = await getLoggedUser()
-        console.log('\nministers\n', user.ministers)
-
-        if (user.ministers && user.ministers.length > 0) {
-            return changeRequestCollection
-                .where('task.minister.id', 'in', user.ministers || [])
-                // .where('task.date', '>=', firestore.Timestamp.now())
-        } else {
-            return changeRequestCollection
-        }
-    })
-}
+export const changeRequestCollection = firestore().collection('change-requests')
 
 export const createChangeRequest = async (taskId: string) => {
     const task: Task = await getTaskById(taskId)

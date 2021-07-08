@@ -59,3 +59,4 @@ buck-out/
 /ios/Pods/
 
 android/java_pid86544.hprof
+ios/ChurchCalendarApp *

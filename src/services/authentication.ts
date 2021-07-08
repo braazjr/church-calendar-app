@@ -25,7 +25,7 @@ const signInWithGoogle = async () => {
         const googleCredential = auth.GoogleAuthProvider.credential(idToken);
         const userCredential = await auth().signInWithCredential(googleCredential);
 
-        checkUserFromFirestore(userCredential.user)
+        // checkUserFromFirestore(userCredential.user)
 
         return true
     } catch (error) {
@@ -36,38 +36,34 @@ const signInWithGoogle = async () => {
 const checkUserFromFirestore = async (user) => {
     firestore()
         .collection('users')
-        .where('uid', '==', user.uid)
+        .doc(user.uid)
         .onSnapshot(observer => {
-            let users = observer.docs
-                .map(doc => ({ id: doc.id, ...doc.data() }));
-
-            if (!users || users.length == 0) {
+            if (!observer.exists || !observer.data()) {
                 let newUser = {
                     name: user.displayName,
                     email: user.email,
                     phoneNumber: user.phoneNumber,
                     photoUrl: user.photoURL,
-                    uid: user.uid,
                 }
 
                 firestore()
                     .collection('users')
-                    .add({ ...newUser })
-                    .then(data => console.info('-- user created', data.id))
-                    .then(() => checkFCMPermissions(true))
+                    .doc(user.uid)
+                    .set({ ...newUser })
+                    .then(() => console.info('user created', user.uid))
+                    .then(() => checkFCMPermissions())
             } else {
-                let userFound = users[0] as User
+                let userFound = observer.data() as User
                 userFound.name = user.displayName || userFound.name
                 // userFound.email = user.email
-                userFound.phoneNumber = user.phoneNumber|| userFound.phoneNumber
-                userFound.photoUrl = user.photoURL|| userFound.photoUrl
-                userFound.uid = user.uid
+                userFound.phoneNumber = user.phoneNumber || userFound.phoneNumber
+                userFound.photoUrl = user.photoURL || userFound.photoUrl
 
                 firestore()
                     .collection('users')
-                    .doc(userFound.id)
+                    .doc(user.uid)
                     .set({ ...userFound })
-                    .then(() => console.info('-- user updated', userFound.id))
+                    .then(() => console.info('user updated', user.uid))
             }
         });
 }
@@ -78,18 +74,21 @@ const getLoggedUser = async (): Promise<User> => {
             .currentUser
             .uid
 
-
         const userData = await firestore()
             .collection('users')
-            .where('uid', '==', uid)
+            .doc(uid)
             .get()
 
-        if (!userData || userData.docs.length == 0) {
+        if (!userData.exists || !userData.data()) {
             return new User()
         }
 
-        const user = userData.docs[0].data()
-        return { id: userData.docs[0].id, ...user } as User
+        const user = userData.data()
+        return {
+            id: userData.id,
+            ...user,
+            isLeader: user.ministersLead && user.ministersLead.length > 0
+        } as User
     } catch (error) {
         console.error('GET_LOGGED_USER_ERROR', error)
 
@@ -98,11 +97,11 @@ const getLoggedUser = async (): Promise<User> => {
 }
 
 const logoff = async () => {
-    await auth()
-        .signOut()
-
     const tokens = await GoogleSignin.getTokens()
     await GoogleSignin.clearCachedAccessToken(tokens.accessToken)
+
+    await auth()
+        .signOut()
 }
 
 const isLeader = async () => {
@@ -110,10 +109,9 @@ const isLeader = async () => {
     return user.ministersLead && user.ministersLead.length > 0
 }
 
-const checkFCMPermissions = async (isLogged) => {
+const checkFCMPermissions = async () => {
     const authorizationStatus = await messaging().requestPermission()
-    if (isLogged
-        && (authorizationStatus == messaging.AuthorizationStatus.AUTHORIZED || authorizationStatus == messaging.AuthorizationStatus.PROVISIONAL)) {
+    if (authorizationStatus == messaging.AuthorizationStatus.AUTHORIZED || authorizationStatus == messaging.AuthorizationStatus.PROVISIONAL) {
         const token = await messaging().getToken()
         await updateFCMTokenOnLoggedUser(token)
     }
@@ -144,5 +142,6 @@ export {
     logoff,
     isLeader,
     checkFCMPermissions,
-    signInWithApple
+    signInWithApple,
+    checkUserFromFirestore
 }

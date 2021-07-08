@@ -21,7 +21,7 @@ import auth from '@react-native-firebase/auth';
 
 import Login from './src/screens/login/Login';
 import { mainStyle } from './config/styles';
-import { checkFCMPermissions, isLeader } from './src/services/authentication';
+import { checkFCMPermissions, checkUserFromFirestore, isLeader } from './src/services/authentication';
 import CreateTask from './src/screens/task/CreateTask';
 import MinisterListScreen from './src/screens/minister/MinisterList';
 import HomeScreen from './src/screens/home/Home';
@@ -137,11 +137,14 @@ export default class App extends Component {
   async componentDidMount() {
     auth()
       .onAuthStateChanged(async user => {
-        console.info('user', user)
         user && user.reload()
 
         const isLogged = user != null
-        checkFCMPermissions(isLogged)
+        if (isLogged) {
+          // checkFCMPermissions()
+          checkUserFromFirestore(user)
+        }
+
         const leader = isLogged ? await isLeader() : false
         console.info('leader', leader)
 
