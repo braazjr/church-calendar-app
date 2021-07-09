@@ -9,12 +9,14 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import Toast, { BaseToast } from 'react-native-toast-message';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 import { hasNotch } from '../../utils/device.util';
 import { getLoggedUser } from '../../services/authentication';
 import { User } from '../../models/user-model';
 import { mainStyle } from '../../../config/styles';
 import { updateUser } from '../../services/user';
+import { getMinisters } from '../../services/minister';
 
 const toastConfig = {
   success: ({ text1, text2, ...rest }) => (
@@ -36,11 +38,15 @@ export default class AccountScreen extends Component {
     user: new User(),
     name: undefined,
     editingName: false,
+    ministers: [],
+    ministersLead: [],
   };
 
   async componentDidMount() {
     let user = await getLoggedUser()
     user.photoUrl = user.photoUrl.replace('s96-c', 's400-c')
+
+    this.getMinisters(user.ministers, user.ministersLead)
 
     this.setState({ user, name: user.name })
   }
@@ -60,8 +66,28 @@ export default class AccountScreen extends Component {
         text1: 'erro',
         text2: 'ocorreu um erro ao atualizar seu nome!'
       }))
+      .finally(() => {
+        user.name = name
+        this.setState({ user, name })
+      })
+  }
 
+  getMinisters(ministers, ministersLead) {
+    getMinisters()
+      .onSnapshot(data => {
+        const ms = data.docChanges()
+          .filter(doc => ministers.includes(doc.doc.id))
+        console.log(ms)
 
+        const msl = data.docChanges()
+          .filter(doc => ministersLead.includes(doc.doc.id))
+        console.log(msl)
+
+        this.setState({
+          ministers: ms.map(doc => doc.doc.data()),
+          ministersLead: msl.map(doc => doc.doc.data()),
+        })
+      })
   }
 
   render() {
@@ -70,6 +96,8 @@ export default class AccountScreen extends Component {
         user,
         name,
         editingName,
+        ministers,
+        ministersLead,
       },
     } = this;
 
@@ -223,6 +251,71 @@ export default class AccountScreen extends Component {
                   alignSelf: 'center',
                   marginVertical: 10,
                 }} />
+
+                <View
+                  style={{ marginTop: 25 }}
+                >
+                  <Text
+                    style={{
+                      color: '#9CAAC4',
+                      fontSize: 14,
+                      fontWeight: '600',
+                    }}
+                  >
+                    ministérios que estou
+                  </Text>
+                  <View
+                    style={{
+                      height: 25,
+                      marginTop: 3,
+                    }}
+                  >
+                    {
+                      ministers.map(minister => (
+                        <Text style={{ fontSize: 14 }}>
+                          <Icon
+                            name={'check'}
+                            color={'#9CAAC4'}
+                            size={20}
+                          /> {minister.name}
+                        </Text>
+                      ))
+                    }
+                  </View>
+                </View>
+
+                <View
+                  style={{ marginTop: 25 }}
+                >
+                  <Text
+                    style={{
+                      color: '#9CAAC4',
+                      fontSize: 14,
+                      fontWeight: '600',
+                      marginTop: 35,
+                    }}
+                  >
+                    lider em
+                  </Text>
+                  <View
+                    style={{
+                      height: 25,
+                      marginTop: 3,
+                    }}
+                  >
+                    {
+                      ministersLead.map(minister => (
+                        <Text style={{ fontSize: 14 }}>
+                          <Icon
+                            name={'check'}
+                            color={'#9CAAC4'}
+                            size={20}
+                          /> {minister.name}
+                        </Text>
+                      ))
+                    }
+                  </View>
+                </View>
               </View>
             </ScrollView>
           </View>
