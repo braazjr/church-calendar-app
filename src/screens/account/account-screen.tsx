@@ -406,7 +406,7 @@ export default class AccountScreen extends Component {
                         alignSelf: 'center',
                         borderRadius: 5,
                         justifyContent: 'center',
-                        marginVertical: 10,
+                        marginVertical: ministersLead.length ==0 ? 20 : 30,
                         backgroundColor: '#32a19b',
                       },
                     ]}

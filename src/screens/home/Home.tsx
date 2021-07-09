@@ -244,30 +244,6 @@ export default class HomeScreen extends Component {
               <View>
                 <View style={{ backgroundColor: '#fff', paddingTop: 20 }}>
                   {
-                    loggedUser && loggedUser.id &&
-                    (<View>
-                      <TouchableOpacity
-                        style={[
-                          styles.createTaskButton,
-                          {
-                            backgroundColor: '#32a19b',
-                          },
-                        ]}
-                        onPress={() => this.logoff()}
-                      >
-                        <Text
-                          style={{
-                            fontSize: 18,
-                            textAlign: 'center',
-                            color: '#fff',
-                          }}
-                        >
-                          deslogar
-                      </Text>
-                      </TouchableOpacity>
-                    </View>)
-                  }
-                  {
                     loggedUser && loggedUser.id && loggedUser.isLeader &&
                     (
                       <TouchableOpacity
