@@ -20,6 +20,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import auth from '@react-native-firebase/auth';
 import { LocaleConfig } from 'react-native-calendars';
 import { Image } from 'react-native';
+import Toast, { BaseToast } from 'react-native-toast-message';
 
 import Login from './src/screens/login/Login';
 import { mainStyle } from './config/styles';
@@ -129,6 +130,21 @@ LocaleConfig.locales['pt-BR'] = {
 };
 LocaleConfig.defaultLocale = 'pt-BR';
 
+const toastConfig = {
+  success: ({ text1, text2, ...rest }) => (
+    <BaseToast
+      {...rest}
+      style={{ borderLeftColor: mainStyle.primaryColor }}
+      contentContainerStyle={{ paddingHorizontal: 15 }}
+      text1Style={{
+        fontSize: 15,
+      }}
+      text1={text1}
+      text2={text2}
+    />
+  ),
+};
+
 export default class App extends Component {
   state = {
     isLogged: false,
@@ -151,7 +167,7 @@ export default class App extends Component {
         const leader = isLogged ? await isLeader() : false
         console.info('leader', leader)
 
-        this.setState({ isLogged, user: isLogged ? user : null, isLeader: leader, userPhoto: user.photoURL })
+        this.setState({ isLogged, user: isLogged ? user : null, isLeader: leader, userPhoto: user?.photoURL })
         SplashScreen.hide()
       })
 
@@ -206,7 +222,6 @@ export default class App extends Component {
                 size={20}
               />
             } else {
-              console.log('userPhoto', userPhoto)
               return (
                 <Image
                   source={{
@@ -238,6 +253,14 @@ export default class App extends Component {
 
     return (
       <NavigationContainer>
+        <Toast
+          ref={(ref) => Toast.setRef(ref)}
+          style={{
+            zIndex: 999,
+            borderLeftColor: mainStyle.primaryColor,
+          }}
+          config={toastConfig}
+        />
         {
           isLogged ?
             (

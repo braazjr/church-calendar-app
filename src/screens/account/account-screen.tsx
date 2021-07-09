@@ -10,6 +10,8 @@ import {
 } from 'react-native';
 import Toast, { BaseToast } from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import ImagePicker from 'react-native-image-crop-picker';
+import storage from '@react-native-firebase/storage';
 
 import { hasNotch } from '../../utils/device.util';
 import { getLoggedUser } from '../../services/authentication';
@@ -17,26 +19,14 @@ import { User } from '../../models/user-model';
 import { mainStyle } from '../../../config/styles';
 import { updateUser } from '../../services/user';
 import { getMinisters } from '../../services/minister';
-
-const toastConfig = {
-  success: ({ text1, text2, ...rest }) => (
-    <BaseToast
-      {...rest}
-      style={{ borderLeftColor: mainStyle.primaryColor }}
-      contentContainerStyle={{ paddingHorizontal: 15 }}
-      text1Style={{
-        fontSize: 15,
-      }}
-      text1={text1}
-      text2={text2}
-    />
-  ),
-};
+import LoadingComponent from '../../components/loading.component';
 
 export default class AccountScreen extends Component {
   state = {
+    isLoading: false,
     user: new User(),
     name: undefined,
+    photoUrl: undefined,
     editingName: false,
     ministers: [],
     ministersLead: [],
@@ -48,7 +38,7 @@ export default class AccountScreen extends Component {
 
     this.getMinisters(user.ministers, user.ministersLead)
 
-    this.setState({ user, name: user.name })
+    this.setState({ user, name: user.name, photoUrl: user.photoUrl })
   }
 
   updateUserName(name) {
@@ -76,12 +66,10 @@ export default class AccountScreen extends Component {
     getMinisters()
       .onSnapshot(data => {
         const ms = data.docChanges()
-          .filter(doc => ministers.includes(doc.doc.id))
-        console.log(ms)
+          .filter(doc => ministers?.includes(doc.doc.id))
 
         const msl = data.docChanges()
-          .filter(doc => ministersLead.includes(doc.doc.id))
-        console.log(msl)
+          .filter(doc => ministersLead?.includes(doc.doc.id))
 
         this.setState({
           ministers: ms.map(doc => doc.doc.data()),
@@ -90,11 +78,67 @@ export default class AccountScreen extends Component {
       })
   }
 
+  loadAndCroppedPhoto() {
+    const { user } = this.state
+
+    ImagePicker.openPicker({
+      width: 400,
+      height: 400,
+      cropping: true
+    }).then(async image => {
+      this.setState({ isLoading: true })
+
+      const imageStorage = await storage()
+        .ref(`users/${user.id}/photo_profile`)
+        .putFile(image.path, {})
+
+      if (imageStorage.error) {
+        Toast.show({
+          type: 'error',
+          position: 'bottom',
+          text1: 'erro',
+          text2: 'ocorreu um erro ao salvar nova foto!'
+        })
+      }
+
+      const downloadUrl = await storage()
+        .ref(`users/${user.id}/photo_profile`)
+        .getDownloadURL()
+
+      console.log('downloadUrl', downloadUrl)
+
+      await this.updatePhoto(downloadUrl)
+    })
+  }
+
+  async updatePhoto(photoUrl) {
+    let { user } = this.state
+    return updateUser(user.id, { photoUrl })
+      .catch(() => Toast.show({
+        type: 'error',
+        position: 'bottom',
+        text1: 'erro',
+        text2: 'ocorreu um erro ao atualizar sua foto!'
+      }))
+      .then(() => Toast.show({
+        type: 'success',
+        position: 'bottom',
+        text1: 'sucesso',
+        text2: 'sua foto foi atualizada!',
+      }))
+      .finally(() => {
+        // user.photoUrl = photoUrl
+        this.setState({ user, photoUrl, isLoading: false })
+      })
+  }
+
   render() {
     const {
       state: {
+        isLoading,
         user,
         name,
+        photoUrl,
         editingName,
         ministers,
         ministersLead,
@@ -103,223 +147,239 @@ export default class AccountScreen extends Component {
 
     return (
       <>
-        <Toast
-          ref={(ref) => Toast.setRef(ref)}
-          style={{
-            zIndex: 999,
-            borderLeftColor: mainStyle.primaryColor,
-          }}
-          config={toastConfig}
-        />
-        <View
-          style={{
-            flex: 1,
-            marginTop: hasNotch() ? 50 : 20,
-            backgroundColor: '#fff'
-          }}
+        <LoadingComponent
+          isLoading={isLoading}
         >
           <View
             style={{
-              width: '100%',
-              height: Dimensions.get('window').height,
-              marginTop: 10,
+              flex: 1,
+              marginTop: hasNotch() ? 50 : 20,
+              backgroundColor: '#fff'
             }}
           >
-            {/* <Text style={styles.title}>
+            <View
+              style={{
+                width: '100%',
+                height: Dimensions.get('window').height,
+                marginTop: 10,
+              }}
+            >
+              {/* <Text style={styles.title}>
               conta
             </Text> */}
-            <ScrollView>
-              <View
-                style={{
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                }}
-              >
-                <Image
-                  source={{ uri: user.photoUrl }}
+              <ScrollView>
+                <View
                   style={{
-                    width: 100,
-                    height: 100,
-                    borderRadius: 50,
-                    marginTop: '5%',
+                    flexDirection: 'column',
+                    alignItems: 'center',
                   }}
-                />
-              </View>
-
-              <View
-                style={{
-                  marginTop: '10%',
-                  marginHorizontal: '8%',
-                }}
-              >
-                <View>
-                  <Text
+                >
+                  <Image
+                    source={{ uri: photoUrl }}
                     style={{
-                      color: '#9CAAC4',
-                      fontSize: 14,
-                      fontWeight: '600',
+                      width: 100,
+                      height: 100,
+                      borderRadius: 50,
+                      marginTop: '5%',
+                    }}
+                  />
+                  <TouchableOpacity
+                    onPress={() => {
+                      this.loadAndCroppedPhoto()
                     }}
                   >
-                    nome
-                  </Text>
-
-                  <View
-                    style={{
-                      height: 25,
-                      marginTop: 3,
-                      flexDirection: 'row'
-                    }}
-                  >
-                    {
-                      editingName ?
-                        (
-                          <TextInput
-                            style={{
-                              fontSize: 19,
-                              flex: 4,
-                            }}
-                            onChange={text => this.setState({ name: text.nativeEvent.text })}
-                            value={name}
-                            placeholder="pesquise novo ministro"
-                          />
-                        )
-                        :
-                        (
-                          <Text style={{
-                            fontSize: 19,
-                            flex: 4,
-                          }}>
-                            {user.name}
-                          </Text>
-                        )
-                    }
-                    <TouchableOpacity
+                    <Text
                       style={{
-                        flex: 1,
-                        alignItems: 'flex-end',
-                      }}
-                      onPress={() => {
-                        if (editingName) {
-                          this.updateUserName(name)
-                        }
-                        this.setState({ editingName: !editingName })
+                        marginVertical: 10,
+                        color: mainStyle.primaryColor,
                       }}
                     >
-                      <Text style={{
+                      upload foto
+                </Text>
+                  </TouchableOpacity>
+                </View>
+
+                <View
+                  style={{
+                    marginTop: '10%',
+                    marginHorizontal: '8%',
+                  }}
+                >
+                  <View>
+                    <Text
+                      style={{
+                        color: '#9CAAC4',
                         fontSize: 14,
-                        marginRight: '5%',
-                        color: mainStyle.primaryColor
-                      }}>
-                        {editingName ? 'salvar' : 'editar'}
+                        fontWeight: '600',
+                      }}
+                    >
+                      nome
+                  </Text>
+
+                    <View
+                      style={{
+                        height: 25,
+                        marginTop: 3,
+                        flexDirection: 'row'
+                      }}
+                    >
+                      {
+                        editingName ?
+                          (
+                            <TextInput
+                              style={{
+                                fontSize: 19,
+                                flex: 4,
+                              }}
+                              onChange={text => this.setState({ name: text.nativeEvent.text })}
+                              value={name}
+                              placeholder="pesquise novo ministro"
+                            />
+                          )
+                          :
+                          (
+                            <Text style={{
+                              fontSize: 19,
+                              flex: 4,
+                            }}>
+                              {user.name}
+                            </Text>
+                          )
+                      }
+                      <TouchableOpacity
+                        style={{
+                          flex: 1,
+                          alignItems: 'flex-end',
+                        }}
+                        onPress={() => {
+                          if (editingName) {
+                            this.updateUserName(name)
+                          }
+                          this.setState({ editingName: !editingName })
+                        }}
+                      >
+                        <Text style={{
+                          fontSize: 14,
+                          marginRight: '5%',
+                          color: mainStyle.primaryColor
+                        }}>
+                          {editingName ? 'salvar' : 'editar'}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                  <View style={{
+                    height: 0.5,
+                    width: '100%',
+                    backgroundColor: '#979797',
+                    alignSelf: 'center',
+                    marginTop: 10,
+                    marginBottom: 30,
+                  }} />
+                  <View>
+                    <Text
+                      style={{
+                        color: '#9CAAC4',
+                        fontSize: 14,
+                        fontWeight: '600',
+                      }}
+                    >
+                      email
+                  </Text>
+                    <View
+                      style={{
+                        height: 25,
+                        marginTop: 3,
+                      }}
+                    >
+                      <Text style={{ fontSize: 19 }}>
+                        {user.email}
                       </Text>
-                    </TouchableOpacity>
+                    </View>
                   </View>
-                </View>
-                <View style={{
-                  height: 0.5,
-                  width: '100%',
-                  backgroundColor: '#979797',
-                  alignSelf: 'center',
-                  marginTop: 10,
-                  marginBottom: 30,
-                }} />
-                <View>
-                  <Text
-                    style={{
-                      color: '#9CAAC4',
-                      fontSize: 14,
-                      fontWeight: '600',
-                    }}
-                  >
-                    email
-                  </Text>
-                  <View
-                    style={{
-                      height: 25,
-                      marginTop: 3,
-                    }}
-                  >
-                    <Text style={{ fontSize: 19 }}>
-                      {user.email}
-                    </Text>
-                  </View>
-                </View>
-                <View style={{
-                  height: 0.5,
-                  width: '100%',
-                  backgroundColor: '#979797',
-                  alignSelf: 'center',
-                  marginVertical: 10,
-                }} />
+                  <View style={{
+                    height: 0.5,
+                    width: '100%',
+                    backgroundColor: '#979797',
+                    alignSelf: 'center',
+                    marginVertical: 10,
+                  }} />
 
-                <View
-                  style={{ marginTop: 25 }}
-                >
-                  <Text
-                    style={{
-                      color: '#9CAAC4',
-                      fontSize: 14,
-                      fontWeight: '600',
-                    }}
-                  >
-                    ministérios que estou
-                  </Text>
                   <View
-                    style={{
-                      height: 25,
-                      marginTop: 3,
-                    }}
+                    style={{ marginTop: 25 }}
                   >
-                    {
-                      ministers.map(minister => (
-                        <Text style={{ fontSize: 14 }}>
-                          <Icon
-                            name={'check'}
-                            color={'#9CAAC4'}
-                            size={20}
-                          /> {minister.name}
-                        </Text>
-                      ))
-                    }
+                    <Text
+                      style={{
+                        color: '#9CAAC4',
+                        fontSize: 14,
+                        fontWeight: '600',
+                      }}
+                    >
+                      ministérios que estou
+                  </Text>
+                    <View
+                      style={{
+                        height: 25,
+                        marginTop: 3,
+                      }}
+                    >
+                      {
+                        ministers.map((minister, index) => (
+                          <Text
+                            key={index}
+                            style={{ fontSize: 14 }}
+                          >
+                            <Icon
+                              name={'check'}
+                              color={'#9CAAC4'}
+                              size={20}
+                            /> {minister.name}
+                          </Text>
+                        ))
+                      }
+                    </View>
                   </View>
-                </View>
 
-                <View
-                  style={{ marginTop: 25 }}
-                >
-                  <Text
-                    style={{
-                      color: '#9CAAC4',
-                      fontSize: 14,
-                      fontWeight: '600',
-                      marginTop: 35,
-                    }}
-                  >
-                    lider em
-                  </Text>
                   <View
-                    style={{
-                      height: 25,
-                      marginTop: 3,
-                    }}
+                    style={{ marginTop: 25 }}
                   >
-                    {
-                      ministersLead.map(minister => (
-                        <Text style={{ fontSize: 14 }}>
-                          <Icon
-                            name={'check'}
-                            color={'#9CAAC4'}
-                            size={20}
-                          /> {minister.name}
-                        </Text>
-                      ))
-                    }
+                    <Text
+                      style={{
+                        color: '#9CAAC4',
+                        fontSize: 14,
+                        fontWeight: '600',
+                        marginTop: 35,
+                      }}
+                    >
+                      lider em
+                  </Text>
+                    <View
+                      style={{
+                        height: 25,
+                        marginTop: 3,
+                      }}
+                    >
+                      {
+                        ministersLead.map((minister, index) => (
+                          <Text
+                            key={index}
+                            style={{ fontSize: 14 }}
+                          >
+                            <Icon
+                              name={'check'}
+                              color={'#9CAAC4'}
+                              size={20}
+                            /> {minister.name}
+                          </Text>
+                        ))
+                      }
+                    </View>
                   </View>
                 </View>
-              </View>
-            </ScrollView>
+              </ScrollView>
+            </View>
           </View>
-        </View>
+        </LoadingComponent>
       </>
     );
   }

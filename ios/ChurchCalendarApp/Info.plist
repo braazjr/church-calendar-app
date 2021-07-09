@@ -99,5 +99,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>O acesso a sua biblioteca é necessário para atualização da foto de perfil</string>
 </dict>
 </plist>

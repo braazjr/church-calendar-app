@@ -71,7 +71,8 @@ const checkUserFromFirestore = async (user) => {
                     userFound.phoneNumber = user.phoneNumber || userFound.phoneNumber
                     userFound.photoUrl = user.photoURL || userFound.photoUrl
 
-                    console.log('updating...', userFound)
+                    console.log('user.photoURL', user.photoURL)
+                    console.log('userFound.photoUrl', userFound.photoUrl)
                     firestore()
                         .collection('users')
                         .doc(user.uid)
@@ -157,6 +158,8 @@ const signInWithApple = async () => {
 
     return true
 }
+
+const updatePhotoOnUser
 
 export {
     signInWithGoogle,
