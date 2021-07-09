@@ -124,7 +124,6 @@ const logoff = async () => {
 
 const isLeader = async () => {
     const user = await getLoggedUser()
-    console.log('user', user)
     return user.ministersLead && user.ministersLead.length > 0
 }
 

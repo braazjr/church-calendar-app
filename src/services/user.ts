@@ -35,7 +35,7 @@ const updateMinistersOnUser = async (userId, ministers) =>
 const updateFCMTokenOnLoggedUser = async (token) => {
     const loggedUser = await getLoggedUser()
     const tokens = [].concat(loggedUser.tokens || [])
-    
+
     if (tokens.indexOf(token) == -1) {
         tokens.push(token)
 
@@ -50,9 +50,17 @@ const updateFCMTokenOnLoggedUser = async (token) => {
     return true
 }
 
+const updateUser = async (userId, params) => {
+    return firestore()
+        .collection('users')
+        .doc(userId)
+        .update(params)
+}
+
 export {
     getUsersFromMinister,
     getUsers,
     updateMinistersOnUser,
-    updateFCMTokenOnLoggedUser
+    updateFCMTokenOnLoggedUser,
+    updateUser
 }

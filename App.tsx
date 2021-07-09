@@ -18,6 +18,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import auth from '@react-native-firebase/auth';
+import { LocaleConfig } from 'react-native-calendars';
+import { Image } from 'react-native';
 
 import Login from './src/screens/login/Login';
 import { mainStyle } from './config/styles';
@@ -28,9 +30,8 @@ import HomeScreen from './src/screens/home/Home';
 import MinisterRegister from './src/screens/minister/register/MinisterRegister';
 import ManagerUsers from './src/screens/minister/register/ManageUsers';
 import ChangeRequestsScreen from './src/screens/change-requests/change-requests-screen';
-import { LocaleConfig } from 'react-native-calendars';
 import ViewTaskScreen from './src/screens/task/ViewTask.screen';
-import { Image } from 'react-native';
+import AccountScreen from './src/screens/account/account-screen';
 
 //  const Section: React.FC<{
 //    title: string;
@@ -198,7 +199,7 @@ export default class App extends Component {
                 break;
             }
 
-            if (route.name !== 'account') {
+            if (route.name !== 'conta') {
               return <Icon
                 name={iconName}
                 color={focused ? mainStyle.primaryColor : color}
@@ -224,7 +225,7 @@ export default class App extends Component {
         <Tab.Screen name={'calendário'} component={HomeScreen} />
         {isLeader && (<Tab.Screen name={'ministérios'} component={MinisterListScreen} />)}
         <Tab.Screen name={'trocas'} component={ChangeRequestsScreen} />
-        <Tab.Screen name={'account'} component={ChangeRequestsScreen} />
+        <Tab.Screen name={'conta'} component={AccountScreen} />
       </Tab.Navigator>
     )
   }
