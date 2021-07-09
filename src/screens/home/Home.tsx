@@ -12,7 +12,7 @@ import moment from 'moment';
 import firestore from '@react-native-firebase/firestore';
 import * as lodash from 'lodash';
 import { CalendarList, MultiDotMarking } from 'react-native-calendars';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import database from '@react-native-firebase/database';
 
 import { Task } from '../../components/Task';
 import { styles } from './styles'
@@ -39,13 +39,25 @@ export default class HomeScreen extends Component {
     loggedUser: null,
     selectedDate: moment(),
     isLoading: false,
+    slackMessage: undefined,
   };
 
   async componentDidMount() {
     this.setState({ isLoading: true })
 
+    const slackMessages = await (await database().ref('/configs/slackMessages').once('value')).toJSON()
+    console.log('slackMessages', slackMessages)
+
+    const slackMessage = await this.getSlackMessage(slackMessages as string[]);
+
     const loggedUser = await getLoggedUser()
-    this.setState({ loggedUser })
+    this.setState({ loggedUser, slackMessage })
+
+
+    // database().ref('/configs/slackMessages')
+    //   .on('value', snapshot => {
+    //     console.log('slackMessages', snapshot.toJSON())
+    //   })
 
     const { currentDate } = this.state;
     this._getTasks(moment(currentDate));
@@ -168,6 +180,17 @@ export default class HomeScreen extends Component {
     return todoList.filter(task => task.ministry.id == loggedUser.id).length > 0
   }
 
+  async getSlackMessage(slackMessages: string[]) {
+    const slackMessagesIndex = Math.random().toPrecision(1).split('.')[1];
+    console.log('slackMessagesIndex', slackMessagesIndex);
+    const slackMessage = slackMessages[slackMessagesIndex];
+    console.log('slackMessage', slackMessage);
+
+    if (!slackMessage) await this.getSlackMessage(slackMessages)
+
+    return slackMessage;
+  }
+
   render() {
     const {
       state: {
@@ -180,7 +203,8 @@ export default class HomeScreen extends Component {
         currentDate,
         loggedUser,
         selectedDate,
-        isLoading
+        isLoading,
+        slackMessage,
       },
       props: {
         navigation
@@ -313,7 +337,55 @@ export default class HomeScreen extends Component {
                       }}
                     >
                       {
-                        (todoList.length == 0 || !this.hasTodayTask()) &&
+                        loggedUser?.ministers?.length == 0 &&
+                        (
+                          <View
+                            style={[
+                              styles.taskListContent,
+                              {
+                                alignContent: 'center',
+                                flexDirection: 'column',
+                                padding: 20,
+                                backgroundColor: 'rgba(230, 166, 45, 0.5)',
+                                height: 'auto',
+                              }]}
+                          >
+                            <Text
+                              style={{
+                                flex: 1,
+                                color: 'black',
+                                fontSize: 18,
+                                fontWeight: '700',
+                              }}
+                            >
+                              sem ministérios
+                          </Text>
+                            <View
+                              style={{
+                                flexDirection: 'row',
+                                alignContent: 'center',
+                                paddingTop: 20,
+                              }}
+                            >
+                              <Text
+                                style={{
+                                  flex: 1,
+                                  color: 'black',
+                                  fontSize: 14,
+                                  flexWrap: 'wrap',
+                                  textAlign: 'center',
+                                }}
+                              >
+                                você ainda não foi convidado(a) a nenhum ministério.
+                            {'\n'}
+                            entre em contato com sua liderança!
+                            </Text>
+                            </View>
+                          </View>
+                        )
+                      }
+                      {
+                        loggedUser?.ministers?.length > 0 && (todoList.length == 0 || !this.hasTodayTask()) &&
                         (
                           <View
                             style={[
@@ -333,7 +405,7 @@ export default class HomeScreen extends Component {
                                 fontWeight: '700',
                               }}
                             >
-                              pode descansar!
+                              sem escalas nessa data!
                           </Text>
                             <Text
                               style={{
@@ -342,7 +414,8 @@ export default class HomeScreen extends Component {
                                 fontSize: 14,
                               }}
                             >
-                              nesse dia você está de folga :)
+                              {/* nesse dia você está de folga :) */}
+                              {`${slackMessage || 'esse dia você está de folga'} :)`}
                             </Text>
                           </View>
                         )
@@ -424,3 +497,4 @@ export default class HomeScreen extends Component {
     );
   }
 }
+
