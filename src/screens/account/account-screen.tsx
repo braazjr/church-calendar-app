@@ -8,13 +8,13 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-import Toast, { BaseToast } from 'react-native-toast-message';
+import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import ImagePicker from 'react-native-image-crop-picker';
 import storage from '@react-native-firebase/storage';
 
 import { hasNotch } from '../../utils/device.util';
-import { getLoggedUser } from '../../services/authentication';
+import { getLoggedUser, logoff } from '../../services/authentication';
 import { User } from '../../models/user-model';
 import { mainStyle } from '../../../config/styles';
 import { updateUser } from '../../services/user';
@@ -35,7 +35,7 @@ export default class AccountScreen extends Component {
 
   async componentDidMount() {
     let user = await getLoggedUser()
-    user.photoUrl = user.photoUrl.replace('s96-c', 's400-c')
+    user.photoUrl = user.photoUrl?.replace('s96-c', 's400-c')
 
     this.getMinisters(user.ministers, user.ministersLead)
 
@@ -131,6 +131,10 @@ export default class AccountScreen extends Component {
         // user.photoUrl = photoUrl
         this.setState({ user, photoUrl, isLoading: false })
       })
+  }
+
+  logoff() {
+    logoff()
   }
 
   render() {
@@ -351,7 +355,7 @@ export default class AccountScreen extends Component {
                   </View>
 
                   <View
-                    // style={{ marginTop: 25 }}
+                  // style={{ marginTop: 25 }}
                   >
                     <Text
                       style={{
@@ -369,15 +373,15 @@ export default class AccountScreen extends Component {
                         marginTop: 3,
                       }}
                     >
-                    {
-                      ministersLead.length == 0 &&
-                      (
-                        <InfoBoxComponent
-                          // title={'teste'}
-                          description={'você não é líder de nenhum ministério'}
-                        />
-                      )
-                    }
+                      {
+                        ministersLead.length == 0 &&
+                        (
+                          <InfoBoxComponent
+                            // title={'teste'}
+                            description={'você não é líder de nenhum ministério'}
+                          />
+                        )
+                      }
                       {
                         ministersLead.map((minister, index) => (
                           <Text
@@ -394,6 +398,30 @@ export default class AccountScreen extends Component {
                       }
                     </View>
                   </View>
+                  <TouchableOpacity
+                    style={[
+                      {
+                        width: '100%',
+                        height: 42,
+                        alignSelf: 'center',
+                        borderRadius: 5,
+                        justifyContent: 'center',
+                        marginVertical: 10,
+                        backgroundColor: '#32a19b',
+                      },
+                    ]}
+                    onPress={() => this.logoff()}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 18,
+                        textAlign: 'center',
+                        color: '#fff',
+                      }}
+                    >
+                      deslogar
+                      </Text>
+                  </TouchableOpacity>
                 </View>
               </ScrollView>
             </View>
