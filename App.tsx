@@ -21,7 +21,7 @@ import auth from '@react-native-firebase/auth';
 
 import Login from './src/screens/login/Login';
 import { mainStyle } from './config/styles';
-import { checkFCMPermissions, checkUserFromFirestore, isLeader } from './src/services/authentication';
+import { checkUserFromFirestore, isLeader } from './src/services/authentication';
 import CreateTask from './src/screens/task/CreateTask';
 import MinisterListScreen from './src/screens/minister/MinisterList';
 import HomeScreen from './src/screens/home/Home';
@@ -30,6 +30,7 @@ import ManagerUsers from './src/screens/minister/register/ManageUsers';
 import ChangeRequestsScreen from './src/screens/change-requests/change-requests-screen';
 import { LocaleConfig } from 'react-native-calendars';
 import ViewTaskScreen from './src/screens/task/ViewTask.screen';
+import { Image } from 'react-native';
 
 //  const Section: React.FC<{
 //    title: string;
@@ -132,6 +133,7 @@ export default class App extends Component {
     isLogged: false,
     user: null,
     isLeader: false,
+    userPhoto: undefined,
   }
 
   async componentDidMount() {
@@ -148,7 +150,7 @@ export default class App extends Component {
         const leader = isLogged ? await isLeader() : false
         console.info('leader', leader)
 
-        this.setState({ isLogged, user: isLogged ? user : null, isLeader: leader })
+        this.setState({ isLogged, user: isLogged ? user : null, isLeader: leader, userPhoto: user.photoURL })
         SplashScreen.hide()
       })
 
@@ -159,7 +161,7 @@ export default class App extends Component {
   TabNavigators = () => {
     const Tab = createBottomTabNavigator();
     const insets = useSafeAreaInsets();
-    const { isLeader } = this.state
+    const { isLeader, userPhoto } = this.state
 
     return (
       <Tab.Navigator
@@ -196,16 +198,33 @@ export default class App extends Component {
                 break;
             }
 
-            return <Icon
-              name={iconName}
-              color={focused ? mainStyle.primaryColor : color}
-              size={20}
-            />
+            if (route.name !== 'account') {
+              return <Icon
+                name={iconName}
+                color={focused ? mainStyle.primaryColor : color}
+                size={20}
+              />
+            } else {
+              console.log('userPhoto', userPhoto)
+              return (
+                <Image
+                  source={{
+                    uri: userPhoto,
+                    width: 40,
+                    height: 40,
+                  }}
+                  style={{
+                    borderRadius: 25
+                  }}
+                />
+              )
+            }
           }
         })}>
         <Tab.Screen name={'calendário'} component={HomeScreen} />
         {isLeader && (<Tab.Screen name={'ministérios'} component={MinisterListScreen} />)}
         <Tab.Screen name={'trocas'} component={ChangeRequestsScreen} />
+        <Tab.Screen name={'account'} component={ChangeRequestsScreen} />
       </Tab.Navigator>
     )
   }
