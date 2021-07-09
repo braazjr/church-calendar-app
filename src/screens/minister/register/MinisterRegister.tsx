@@ -130,7 +130,7 @@ export default class MinisterRegister extends Component {
           <View
             style={{
               height: visibleHeight,
-              paddingTop: Platform.OS == 'android' ? 26 : hasNotch() ? 50 : 15,
+              paddingTop: Platform.OS == 'android' ? 60 : hasNotch() ? 50 : 15,
             }}
           >
             <ScrollView

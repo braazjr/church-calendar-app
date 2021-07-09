@@ -24,6 +24,7 @@ import { deleteTask, updateTask } from '../../services/task';
 import { createChangeRequest } from '../../services/change-requests.service';
 import { Task } from '../../models/task-model';
 import { hasNotch } from '../../utils/device.util';
+import { Minister } from '../../models/minister.model';
 
 const { width: vw } = Dimensions.get('window');
 // moment().format('YYYY/MM/DD')
@@ -91,41 +92,37 @@ export default class CreateTask extends Component {
   }
 
   async _getMinisters(minister = undefined, ministersLead = []) {
-    let ministerCollection = getMinisters()
+    getMinisters()
+      .onSnapshot(observer => {
+        let ministers: Minister[] = observer.docs
+          .filter(doc => ministersLead.includes(doc.id))
+          .map(doc => ({ id: doc.id, ...doc.data() }) as Minister)
 
-    if (ministersLead.length > 0) {
-      ministerCollection = ministerCollection.where('id', 'in', ministersLead)
-    }
+        let ministerOptions = ministers.map(m => m.name);
+        ministerOptions.push('cancel');
 
-    ministerCollection.onSnapshot(observer => {
-      let ministers = observer.docs
-        .map(doc => ({ id: doc.id, ...doc.data() }))
+        if (minister) {
+          const ministerSelected = ministers.find(m => m.id == minister.id)
 
-      let ministerOptions = ministers.map(m => m.name);
-      ministerOptions.push('cancel');
+          this.setState({
+            ministers,
+            actionSheetMinisterOptions: ministerOptions,
+            availableFunctions: ministerSelected.functions
+          });
 
-      if (minister) {
-        const ministerSelected = ministers.find(m => m.id == minister.id)
+          this._getUsersFromMinister(ministerSelected)
+        } else {
+          this.setState({
+            ministers,
+            actionSheetMinisterOptions: ministerOptions
+          });
+        }
 
-        this.setState({
+        return {
           ministers,
-          actionSheetMinisterOptions: ministerOptions,
-          availableFunctions: ministerSelected.functions
-        });
-
-        this._getUsersFromMinister(ministerSelected)
-      } else {
-        this.setState({
-          ministers,
-          actionSheetMinisterOptions: ministerOptions
-        });
-      }
-
-      return {
-        ministers,
-        ministerOptions
-      }
-    });
+          ministerOptions
+        }
+      });
   }
 
   _keyboardDidShow = e => {

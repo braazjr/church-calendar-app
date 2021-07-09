@@ -1,5 +1,5 @@
 export class Minister {
-    id: string
+    id?: string
     color: string
     name: string
     functions: string[]

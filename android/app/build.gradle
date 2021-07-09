@@ -137,8 +137,8 @@ android {
         applicationId "com.braazjr.churchcalendar"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 22
-        versionName "1.1.7"
+        versionCode 23
+        versionName "1.1.8"
     }
     splits {
         abi {

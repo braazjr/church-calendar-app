@@ -14,6 +14,7 @@ import { styles } from './styles';
 import { addUserOnMinister, removeUserOnMinister } from '../../../services/minister';
 import { getUsers, getUsersFromMinister } from '../../../services/user';
 import LoadingComponent from '../../../components/loading.component';
+import { User } from '../../../models/user.model';
 
 const { width: vw } = Dimensions.get('window');
 
@@ -39,8 +40,11 @@ export default class ManagerUsers extends Component {
       ministerId,
     } = this.props['route'].params || {}
 
-    const users = await getUsersFromMinister(ministerId)
-    const avaiableUsers = await getUsers()
+    const users: User[] = await getUsersFromMinister(ministerId)
+    console.log('users', users.map(u => u.name))
+    let avaiableUsers: User[] = await getUsers()
+    avaiableUsers = avaiableUsers.filter(user => !users.map(u => u.id).includes(user.id) && user.name != null && user.name != 'null')
+    console.log('avaiableUsers', avaiableUsers.map(au => au.name))
 
     this.setState({
       users,
@@ -139,7 +143,7 @@ export default class ManagerUsers extends Component {
                             if (text.nativeEvent.text.length >= 3) {
                               this.setState({
                                 usersFound: avaiableUsers
-                                  .filter(us => us.name.toLowerCase().includes(newUser.toLowerCase()) && !users.map(u => u.name).includes(us.name))
+                                  .filter(au => au.name.toLowerCase().includes(text.nativeEvent.text.toLowerCase()))
                               })
                             }
                           }}

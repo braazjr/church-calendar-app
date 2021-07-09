@@ -2,8 +2,11 @@ import auth from '@react-native-firebase/auth';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import firestore from '@react-native-firebase/firestore';
 import messaging from '@react-native-firebase/messaging';
-import { Alert } from 'react-native';
+import { Alert, Platform } from 'react-native';
 import { appleAuth } from '@invertase/react-native-apple-authentication';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import moment from 'moment';
 
 import { User } from '../models/user-model';
 import { updateFCMTokenOnLoggedUser } from './user';
@@ -26,6 +29,7 @@ const signInWithGoogle = async () => {
         const userCredential = await auth().signInWithCredential(googleCredential);
 
         // checkUserFromFirestore(userCredential.user)
+        checkFCMPermissions()
 
         return true
     } catch (error) {
@@ -34,38 +38,50 @@ const signInWithGoogle = async () => {
 }
 
 const checkUserFromFirestore = async (user) => {
-    firestore()
-        .collection('users')
-        .doc(user.uid)
-        .onSnapshot(observer => {
-            if (!observer.exists || !observer.data()) {
-                let newUser = {
-                    name: user.displayName,
-                    email: user.email,
-                    phoneNumber: user.phoneNumber,
-                    photoUrl: user.photoURL,
+    const userStorage = await AsyncStorage.getItem(user.uid)
+    let plus1day;
+
+    if (userStorage) {
+        plus1day = moment(JSON.parse(userStorage).updateDateTime).add('day', 1)
+    }
+
+    if (!userStorage || moment().isSameOrAfter(plus1day)) {
+        firestore()
+            .collection('users')
+            .doc(user.uid)
+            .onSnapshot(async observer => {
+                if (!observer.exists || !observer.data()) {
+                    let newUser = {
+                        name: user.displayName,
+                        email: user.email,
+                        phoneNumber: user.phoneNumber,
+                        photoUrl: user.photoURL,
+                    }
+
+                    firestore()
+                        .collection('users')
+                        .doc(user.uid)
+                        .set({ ...newUser })
+                        .then(() => console.info('user created', user.uid))
+                        // .then(() => checkFCMPermissions())
+                } else {
+                    let userFound = observer.data() as User
+                    // userFound.name = user.displayName || userFound.name
+                    // userFound.email = user.email
+                    userFound.phoneNumber = user.phoneNumber || userFound.phoneNumber
+                    userFound.photoUrl = user.photoURL || userFound.photoUrl
+
+                    console.log('updating...', userFound)
+                    firestore()
+                        .collection('users')
+                        .doc(user.uid)
+                        .update({ ...userFound })
+                        .then(() => console.info('user updated', user.uid))
                 }
 
-                firestore()
-                    .collection('users')
-                    .doc(user.uid)
-                    .set({ ...newUser })
-                    .then(() => console.info('user created', user.uid))
-                    .then(() => checkFCMPermissions())
-            } else {
-                let userFound = observer.data() as User
-                userFound.name = user.displayName || userFound.name
-                // userFound.email = user.email
-                userFound.phoneNumber = user.phoneNumber || userFound.phoneNumber
-                userFound.photoUrl = user.photoURL || userFound.photoUrl
-
-                firestore()
-                    .collection('users')
-                    .doc(user.uid)
-                    .set({ ...userFound })
-                    .then(() => console.info('user updated', user.uid))
-            }
-        });
+                await AsyncStorage.setItem(user.uid, JSON.stringify({ updateDateTime: moment() }))
+            });
+    }
 }
 
 const getLoggedUser = async (): Promise<User> => {
@@ -97,8 +113,10 @@ const getLoggedUser = async (): Promise<User> => {
 }
 
 const logoff = async () => {
-    const tokens = await GoogleSignin.getTokens()
-    await GoogleSignin.clearCachedAccessToken(tokens.accessToken)
+    if (Platform.OS !== 'ios') {
+        const tokens = await GoogleSignin.getTokens()
+        await GoogleSignin.clearCachedAccessToken(tokens.accessToken)
+    }
 
     await auth()
         .signOut()
@@ -106,6 +124,7 @@ const logoff = async () => {
 
 const isLeader = async () => {
     const user = await getLoggedUser()
+    console.log('user', user)
     return user.ministersLead && user.ministersLead.length > 0
 }
 
@@ -130,10 +149,14 @@ const signInWithApple = async () => {
         throw 'Apple Sign-In failed - no identify token returned';
     }
 
-    const { identityToken, nonce } = appleAuthRequestResponse;
+    const { fullName, identityToken, nonce } = appleAuthRequestResponse;
     const appleCredential = auth.AppleAuthProvider.credential(identityToken, nonce);
 
-    return auth().signInWithCredential(appleCredential);
+    await auth().signInWithCredential(appleCredential);
+
+    checkFCMPermissions()
+
+    return true
 }
 
 export {

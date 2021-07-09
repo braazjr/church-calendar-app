@@ -1,26 +1,27 @@
 import firestore from '@react-native-firebase/firestore';
 import { getLoggedUser } from './authentication';
+import { User } from '../models/user.model';
 
-const getUsersFromMinister = (ministerId) => {
+const getUsersFromMinister = (ministerId): Promise<User[]> => {
     return new Promise(resolve => {
         firestore()
             .collection('users')
             .where('ministers', 'array-contains', ministerId)
             .onSnapshot(observer => {
                 resolve(observer.docs
-                    .map(doc => ({ id: doc.id, ...doc.data() })));
+                    .map(doc => ({ id: doc.id, ...doc.data() }) as User));
             });
     })
 }
 
-const getUsers = () => {
+const getUsers = (): Promise<User[]> => {
     return new Promise(resolve => {
         firestore()
             .collection('users')
             // .where('ministers', 'array-contains', ministerId)
             .onSnapshot(observer => {
                 resolve(observer.docs
-                    .map(doc => ({ id: doc.id, ...doc.data() })));
+                    .map(doc => ({ id: doc.id, ...doc.data() }) as User));
             });
     })
 }
