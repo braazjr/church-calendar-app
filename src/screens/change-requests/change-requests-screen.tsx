@@ -136,7 +136,7 @@ export default class ChangeRequestsScreen extends Component {
                       {
                         borderRightColor: item.task.minister.color,
                         borderRightWidth: 10,
-                        backgroundColor: item.done ? mainStyle.primeryOpacityColor : mainStyle.primaryColor
+                        backgroundColor: item.done ? mainStyle.primaryOpacityColor : mainStyle.primaryColor
                       }
                     ]}
                   >

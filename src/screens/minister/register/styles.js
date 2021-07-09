@@ -1,4 +1,5 @@
 import { Platform, StyleSheet } from 'react-native';
+import { mainStyle } from '../../../../config/styles';
 
 export const styles = StyleSheet.create({
     createButton: {
@@ -110,7 +111,7 @@ export const styles = StyleSheet.create({
     },
     container: {
       flex: 1,
-      backgroundColor: '#31a09a3d',
+      backgroundColor: mainStyle.primaryOpacityColor,
     },
     listContent: {
         height: 80,
