@@ -16,7 +16,7 @@ import database from '@react-native-firebase/database';
 
 import { Task } from '../../components/Task';
 import { styles } from './styles'
-import { getLoggedUser, logoff } from '../../services/authentication';
+import { getLoggedUser } from '../../services/authentication';
 import LoadingComponent from '../../components/loading.component';
 import { mainStyle } from '../../../config/styles';
 import { hasNotch } from '../../utils/device.util';
@@ -171,10 +171,6 @@ export default class HomeScreen extends Component {
     this._hideDateTimePicker();
   };
 
-  logoff() {
-    logoff()
-  }
-
   hasTodayTask() {
     const { loggedUser, todoList } = this.state
     return todoList.filter(task => task.ministry.id == loggedUser.id).length > 0
@@ -194,7 +190,6 @@ export default class HomeScreen extends Component {
   render() {
     const {
       state: {
-        visibleHeight,
         markedDates,
         todoList,
         isModalVisible,
