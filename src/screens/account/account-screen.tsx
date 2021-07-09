@@ -20,6 +20,7 @@ import { mainStyle } from '../../../config/styles';
 import { updateUser } from '../../services/user';
 import { getMinisters } from '../../services/minister';
 import LoadingComponent from '../../components/loading.component';
+import InfoBoxComponent from '../../components/info-box.component';
 
 export default class AccountScreen extends Component {
   state = {
@@ -124,7 +125,7 @@ export default class AccountScreen extends Component {
         type: 'success',
         position: 'bottom',
         text1: 'sucesso',
-        text2: 'sua foto foi atualizada!',
+        text2: 'sua foto foi atualizada! em breve estará disponível!',
       }))
       .finally(() => {
         // user.photoUrl = photoUrl
@@ -319,10 +320,19 @@ export default class AccountScreen extends Component {
                   </Text>
                     <View
                       style={{
-                        height: 25,
+                        // height: 25,
                         marginTop: 3,
                       }}
                     >
+                      {
+                        ministers.length == 0 &&
+                        (
+                          <InfoBoxComponent
+                            // title={'teste'}
+                            description={'você ainda não está em nenhum ministério'}
+                          />
+                        )
+                      }
                       {
                         ministers.map((minister, index) => (
                           <Text
@@ -341,24 +351,33 @@ export default class AccountScreen extends Component {
                   </View>
 
                   <View
-                    style={{ marginTop: 25 }}
+                    // style={{ marginTop: 25 }}
                   >
                     <Text
                       style={{
                         color: '#9CAAC4',
                         fontSize: 14,
                         fontWeight: '600',
-                        marginTop: 35,
+                        marginTop: 15,
                       }}
                     >
                       lider em
                   </Text>
                     <View
                       style={{
-                        height: 25,
+                        // height: 25,
                         marginTop: 3,
                       }}
                     >
+                    {
+                      ministersLead.length == 0 &&
+                      (
+                        <InfoBoxComponent
+                          // title={'teste'}
+                          description={'você não é líder de nenhum ministério'}
+                        />
+                      )
+                    }
                       {
                         ministersLead.map((minister, index) => (
                           <Text
