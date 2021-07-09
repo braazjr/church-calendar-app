@@ -1,6 +1,7 @@
 import firestore from '@react-native-firebase/firestore';
 import { getLoggedUser } from './authentication';
 import { User } from '../models/user.model';
+import auth from '@react-native-firebase/auth';
 
 const getUsersFromMinister = (ministerId): Promise<User[]> => {
     return new Promise(resolve => {
@@ -51,7 +52,15 @@ const updateFCMTokenOnLoggedUser = async (token) => {
 }
 
 const updateUser = async (userId, params) => {
-    return firestore()
+    const authBody = {}
+    if (params.name) authBody['name'] = params.name
+    if (params.photoUrl) authBody['photoURL'] = params.photoUrl
+
+    await auth()
+        .currentUser
+        .updateProfile(authBody)
+
+    await firestore()
         .collection('users')
         .doc(userId)
         .update(params)
