@@ -46,42 +46,42 @@ const checkUserFromFirestore = async (user) => {
     }
 
     if (!userStorage || moment().isSameOrAfter(plus1day)) {
-        firestore()
+        const userData = await firestore()
             .collection('users')
             .doc(user.uid)
-            .onSnapshot(async observer => {
-                if (!observer.exists || !observer.data()) {
-                    let newUser = {
-                        name: user.displayName,
-                        email: user.email,
-                        phoneNumber: user.phoneNumber,
-                        photoUrl: user.photoURL,
-                    }
+            .get()
 
-                    firestore()
-                        .collection('users')
-                        .doc(user.uid)
-                        .set({ ...newUser })
-                        .then(() => console.info('user created', user.uid))
-                        // .then(() => checkFCMPermissions())
-                } else {
-                    let userFound = observer.data() as User
-                    // userFound.name = user.displayName || userFound.name
-                    // userFound.email = user.email
-                    userFound.phoneNumber = user.phoneNumber || userFound.phoneNumber
-                    userFound.photoUrl = user.photoURL || userFound.photoUrl
+        if (!userData.exists || !userData.data()) {
+            let newUser = {
+                name: user.displayName,
+                email: user.email,
+                phoneNumber: user.phoneNumber,
+                photoUrl: user.photoURL,
+            }
 
-                    console.log('user.photoURL', user.photoURL)
-                    console.log('userFound.photoUrl', userFound.photoUrl)
-                    firestore()
-                        .collection('users')
-                        .doc(user.uid)
-                        .update({ ...userFound })
-                        .then(() => console.info('user updated', user.uid))
-                }
+            firestore()
+                .collection('users')
+                .doc(user.uid)
+                .set({ ...newUser })
+                .then(() => console.info('user created', user.uid))
+            // .then(() => checkFCMPermissions())
+        } else {
+            let userFound = userData.data() as User
+            // userFound.name = user.displayName || userFound.name
+            // userFound.email = user.email
+            userFound.phoneNumber = user.phoneNumber || userFound.phoneNumber
+            userFound.photoUrl = user.photoURL || userFound.photoUrl
 
-                await AsyncStorage.setItem(user.uid, JSON.stringify({ updateDateTime: moment() }))
-            });
+            console.log('user.photoURL', user.photoURL)
+            console.log('userFound.photoUrl', userFound.photoUrl)
+            firestore()
+                .collection('users')
+                .doc(user.uid)
+                .update({ ...userFound })
+                .then(() => console.info('user updated', user.uid))
+        }
+
+        await AsyncStorage.setItem(user.uid, JSON.stringify({ updateDateTime: moment() }))
     }
 }
 
