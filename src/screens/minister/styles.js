@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import { mainStyleColors } from '../../../config/styles';
 
 export const styles = StyleSheet.create({
   listContent: {
@@ -7,7 +8,7 @@ export const styles = StyleSheet.create({
       alignSelf: 'center',
       borderRadius: 10,
       shadowColor: '#2E66E7',
-      backgroundColor: '#32a19b',
+      backgroundColor: mainStyleColors.primaryColor,
       marginTop: 10,
       marginBottom: 10,
       shadowOffset: {
@@ -27,11 +28,11 @@ export const styles = StyleSheet.create({
       right: 17,
       height: 60,
       width: 60,
-      backgroundColor: '#32a19b',
+      backgroundColor: mainStyleColors.primaryColor,
       borderRadius: 30,
       justifyContent: 'center',
       alignItems: 'center',
-      shadowColor: '#32a19b',
+      shadowColor: mainStyleColors.primaryColor,
       shadowOffset: {
         width: 0,
         height: 5,

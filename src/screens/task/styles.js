@@ -1,10 +1,10 @@
 import { StyleSheet } from 'react-native';
 // import Constants from 'expo-constants';
-import { mainStyle } from '../../../config/styles';
+import { mainStyleColors } from '../../../config/styles';
 
 export const styles = StyleSheet.create({
     createTaskButton: {
-      width: 252,
+      width: 327,
       height: 48,
       alignSelf: 'center',
       marginTop: 40,
@@ -116,6 +116,6 @@ export const styles = StyleSheet.create({
     container: {
       flex: 1,
       // paddingTop: Constants.statusBarHeight,
-      backgroundColor: mainStyle.primaryOpacityColor,
+      backgroundColor: mainStyleColors.primaryOpacityColor,
     },
   });

@@ -13,10 +13,9 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import ImagePicker from 'react-native-image-crop-picker';
 import storage from '@react-native-firebase/storage';
 
-import { hasNotch } from '../../utils/device.util';
 import { getLoggedUser, logoff } from '../../services/authentication';
 import { User } from '../../models/user-model';
-import { mainStyle } from '../../../config/styles';
+import { mainStyleColors, mainStyles } from '../../../config/styles';
 import { updateUser } from '../../services/user';
 import { getMinisters } from '../../services/minister';
 import LoadingComponent from '../../components/loading.component';
@@ -158,7 +157,8 @@ export default class AccountScreen extends Component {
           <View
             style={{
               flex: 1,
-              marginTop: hasNotch() ? 50 : 20,
+              // marginTop: hasNotch() ? 50 : 20,
+              marginTop: 50,
               backgroundColor: '#fff'
             }}
           >
@@ -196,7 +196,7 @@ export default class AccountScreen extends Component {
                     <Text
                       style={{
                         marginVertical: 10,
-                        color: mainStyle.primaryColor,
+                        color: mainStyleColors.primaryColor,
                       }}
                     >
                       upload foto
@@ -266,7 +266,7 @@ export default class AccountScreen extends Component {
                         <Text style={{
                           fontSize: 14,
                           marginRight: '5%',
-                          color: mainStyle.primaryColor
+                          color: mainStyleColors.primaryColor
                         }}>
                           {editingName ? 'salvar' : 'editar'}
                         </Text>
@@ -400,14 +400,10 @@ export default class AccountScreen extends Component {
                   </View>
                   <TouchableOpacity
                     style={[
+                      mainStyles.button,
                       {
-                        width: '100%',
                         height: 42,
-                        alignSelf: 'center',
-                        borderRadius: 5,
-                        justifyContent: 'center',
                         marginVertical: ministersLead.length ==0 ? 20 : 30,
-                        backgroundColor: '#32a19b',
                       },
                     ]}
                     onPress={() => this.logoff()}

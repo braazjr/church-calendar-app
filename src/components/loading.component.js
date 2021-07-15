@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Animated, Image, StyleSheet, Text, View } from 'react-native';
-import { mainStyle } from '../../config/styles';
 import * as Animatable from 'react-native-animatable';
+import { mainStyleColors } from '../../config/styles';
 
 export default class LoadingComponent extends Component {
     state = {
@@ -37,7 +37,7 @@ export default class LoadingComponent extends Component {
             <>
                 {isLoading ? (
                     <View style={{
-                        backgroundColor: mainStyle.secondayColor,
+                        backgroundColor: mainStyleColors.secondayColor,
                         height: '100%'
                     }}>
                         <Animated.View
@@ -72,7 +72,7 @@ export default class LoadingComponent extends Component {
                         >
                             <Text
                                 style={{
-                                    color: mainStyle.primaryColor,
+                                    color: mainStyleColors.primaryColor,
                                     fontSize: 16,
                                 }}
                             >

@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Alert, Dimensions, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import moment from 'moment';
-import firestore from '@react-native-firebase/firestore';
 
 import { styles } from './styles';
 import { Task } from '../../models/task-model';
@@ -10,6 +9,7 @@ import { getMinisters } from '../../services/minister';
 import { Minister } from '../../models/minister.model';
 import { User } from '../../models/user.model';
 import { createChangeRequest } from '../../services/change-requests.service';
+import { mainStyles } from '../../../config/styles';
 
 const { width: vw, height: visibleHeight } = Dimensions.get('window');
 
@@ -104,7 +104,7 @@ export default class ViewTaskScreen extends Component {
                             </View>
                             <Text style={styles.newTask}>sua escala</Text>
                         </View>
-                        <View style={styles.taskContainer}>
+                        <View style={mainStyles.cardContainer}>
                             <View>
                                 <Text
                                     style={{

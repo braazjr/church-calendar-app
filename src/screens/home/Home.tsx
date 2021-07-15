@@ -5,6 +5,7 @@ import {
   ScrollView,
   Text,
   Dimensions,
+  RefreshControl,
 } from 'react-native';
 
 import DateTimePicker from 'react-native-modal-datetime-picker';
@@ -16,10 +17,9 @@ import database from '@react-native-firebase/database';
 
 import { Task } from '../../components/Task';
 import { styles } from './styles'
-import { getLoggedUser } from '../../services/authentication';
+import { checkFCMPermissions, getLoggedUser } from '../../services/authentication';
 import LoadingComponent from '../../components/loading.component';
-import { mainStyle } from '../../../config/styles';
-import { hasNotch } from '../../utils/device.util';
+import { mainStyleColors, mainStyles } from '../../../config/styles';
 
 export default class HomeScreen extends Component {
   state = {
@@ -40,27 +40,23 @@ export default class HomeScreen extends Component {
     selectedDate: moment(),
     isLoading: false,
     slackMessage: undefined,
+    isRefreshing: false,
   };
 
   async componentDidMount() {
     this.setState({ isLoading: true })
 
     const slackMessages = await (await database().ref('/configs/slackMessages').once('value')).toJSON()
-    console.log('slackMessages', slackMessages)
 
     const slackMessage = await this.getSlackMessage(slackMessages as string[]);
 
     const loggedUser = await getLoggedUser()
     this.setState({ loggedUser, slackMessage })
 
-
-    // database().ref('/configs/slackMessages')
-    //   .on('value', snapshot => {
-    //     console.log('slackMessages', snapshot.toJSON())
-    //   })
-
     const { currentDate } = this.state;
     this._getTasks(moment(currentDate));
+
+    checkFCMPermissions()
   }
 
   _keyboardDidShow = e => {
@@ -139,6 +135,7 @@ export default class HomeScreen extends Component {
             markedDates: markDot,
             todoList: tasksByDate,
             isLoading: false,
+            isRefreshing: false,
           });
         }, error => {
           console.error(error)
@@ -178,9 +175,7 @@ export default class HomeScreen extends Component {
 
   async getSlackMessage(slackMessages: string[]) {
     const slackMessagesIndex = Math.random().toPrecision(1).split('.')[1];
-    console.log('slackMessagesIndex', slackMessagesIndex);
     const slackMessage = slackMessages[slackMessagesIndex];
-    console.log('slackMessage', slackMessage);
 
     if (!slackMessage) await this.getSlackMessage(slackMessages)
 
@@ -200,6 +195,7 @@ export default class HomeScreen extends Component {
         selectedDate,
         isLoading,
         slackMessage,
+        isRefreshing,
       },
       props: {
         navigation
@@ -224,19 +220,28 @@ export default class HomeScreen extends Component {
         >
           <View
             style={{
-              marginTop: hasNotch() ? 50 : 20,
+              // marginTop: hasNotch() ? 50 : 20,
+              marginTop: 50,
             }}
           >
             <ScrollView
               contentContainerStyle={{
                 paddingBottom: 100,
               }}
+              refreshControl={
+                <RefreshControl
+                  refreshing={isRefreshing}
+                  onRefresh={() => {
+                    this.componentDidMount()
+                  }}
+                />
+              }
             >
               <View style={{
                 width: 350,
                 alignSelf: 'center',
                 borderBottomWidth: 2,
-                borderBottomColor: mainStyle.primaryColor,
+                borderBottomColor: mainStyleColors.primaryColor,
               }}>
                 <CalendarList
                   style={{
@@ -256,9 +261,9 @@ export default class HomeScreen extends Component {
                   monthFormat="yyyy MMMM"
                   hideArrows
                   theme={{
-                    selectedDayBackgroundColor: '#32a19b',
+                    selectedDayBackgroundColor: mainStyleColors.primaryColor,
                     selectedDayTextColor: '#ffffff',
-                    todayTextColor: '#32a19b',
+                    todayTextColor: mainStyleColors.primaryColor,
                     calendarBackground: 'transparent',
                     textDisabledColor: '#d9dbe0',
                   }}
@@ -273,15 +278,12 @@ export default class HomeScreen extends Component {
                     (
                       <TouchableOpacity
                         style={[
-                          styles.createTaskButton,
-                          {
-                            backgroundColor: '#32a19b',
-                          },
+                          styles.createTaskButton
                         ]}
                         onPress={async () => {
                           navigation.navigate('CreateTask', {
                             updateCurrentTask: this._getTasks,
-                            currentDate,
+                            // currentDate,
                           })
                         }}
                       >
@@ -302,162 +304,168 @@ export default class HomeScreen extends Component {
                       width: '100%',
                     }}
                   >
-                    <ScrollView
+                    {/* <ScrollView
                       contentContainerStyle={{
                         paddingBottom: 20,
                       }}
-                    >
-                      {
-                        loggedUser?.ministers?.length == 0 &&
-                        (
-                          <View
-                            style={[
-                              styles.taskListContent,
-                              {
-                                alignContent: 'center',
-                                flexDirection: 'column',
-                                padding: 20,
-                                backgroundColor: 'rgba(230, 166, 45, 0.5)',
-                                height: 'auto',
-                              }]}
+                    > */}
+                    {
+                      loggedUser?.ministers?.length == 0 &&
+                      (
+                        <View
+                          style={[
+                            mainStyles.cardList,
+                            {
+                              alignContent: 'center',
+                              flexDirection: 'column',
+                              padding: 20,
+                              backgroundColor: 'rgba(230, 166, 45, 0.5)',
+                              height: 'auto',
+                            }]}
+                        >
+                          <Text
+                            style={{
+                              flex: 1,
+                              color: 'black',
+                              fontSize: 18,
+                              fontWeight: '700',
+                            }}
                           >
-                            <Text
-                              style={{
-                                flex: 1,
-                                color: 'black',
-                                fontSize: 18,
-                                fontWeight: '700',
-                              }}
-                            >
-                              sem ministérios
+                            sem ministérios
                           </Text>
-                            <View
-                              style={{
-                                flexDirection: 'row',
-                                alignContent: 'center',
-                                paddingTop: 20,
-                              }}
-                            >
-                              <Text
-                                style={{
-                                  flex: 1,
-                                  color: 'black',
-                                  fontSize: 14,
-                                  flexWrap: 'wrap',
-                                  textAlign: 'center',
-                                }}
-                              >
-                                você ainda não foi convidado(a) a nenhum ministério.
-                            {'\n'}
-                            entre em contato com sua liderança!
-                            </Text>
-                            </View>
-                          </View>
-                        )
-                      }
-                      {
-                        loggedUser?.ministers?.length > 0 && (todoList.length == 0 || !this.hasTodayTask()) &&
-                        (
                           <View
-                            style={[
-                              styles.taskListContent,
-                              {
-                                alignContent: 'center',
-                                flexDirection: 'column',
-                                padding: 20,
-                                backgroundColor: 'rgba(230, 166, 45, 0.5)',
-                              }]}
+                            style={{
+                              flexDirection: 'row',
+                              alignContent: 'center',
+                              paddingTop: 20,
+                            }}
                           >
-                            <Text
-                              style={{
-                                flex: 1,
-                                color: 'black',
-                                fontSize: 18,
-                                fontWeight: '700',
-                              }}
-                            >
-                              sem escalas nessa data!
-                          </Text>
                             <Text
                               style={{
                                 flex: 1,
                                 color: 'black',
                                 fontSize: 14,
+                                flexWrap: 'wrap',
+                                textAlign: 'center',
                               }}
                             >
-                              {/* nesse dia você está de folga :) */}
-                              {`${slackMessage || 'esse dia você está de folga'} :)`}
+                              você ainda não foi convidado(a) a nenhum ministério.
+                            {'\n'}
+                            entre em contato com sua liderança!
                             </Text>
                           </View>
-                        )
-                      }
-                      {todoList.map(item => (
-                        <TouchableOpacity
-                          onPress={() => {
-                            let destinationPage = loggedUser?.ministersLead && loggedUser.ministersLead.length > 0 ? 'CreateTask' : 'ViewTask'
-                            navigation.navigate(destinationPage, {
-                              updateCurrentTask: this._getTasks,
-                              currentDate,
-                              itemSaved: {
-                                ...item,
-                              }
-                            })
+                        </View>
+                      )
+                    }
+                    {
+                      loggedUser?.ministers?.length > 0 && (todoList.length == 0 || !this.hasTodayTask()) &&
+                      (
+                        <View
+                          style={[
+                            mainStyles.cardList,
+                            {
+                              alignContent: 'center',
+                              flexDirection: 'column',
+                              padding: 20,
+                              backgroundColor: 'rgba(230, 166, 45, 0.5)',
+                            }]}
+                        >
+                          <Text
+                            style={{
+                              flex: 1,
+                              color: 'black',
+                              fontSize: 18,
+                              fontWeight: '700',
+                            }}
+                          >
+                            sem escalas nessa data!
+                          </Text>
+                          <Text
+                            style={{
+                              flex: 1,
+                              color: 'black',
+                              fontSize: 14,
+                            }}
+                          >
+                            {/* nesse dia você está de folga :) */}
+                            {`${slackMessage || 'esse dia você está de folga'} :)`}
+                          </Text>
+                        </View>
+                      )
+                    }
+                    {todoList.map(item => (
+                      <TouchableOpacity
+                        onPress={() => {
+                          let destinationPage = loggedUser?.ministersLead && loggedUser.ministersLead.length > 0 ? 'CreateTask' : 'ViewTask'
+                          navigation.navigate(destinationPage, {
+                            updateCurrentTask: this._getTasks,
+                            currentDate,
+                            itemSaved: {
+                              ...item,
+                            }
+                          })
+                        }}
+                        key={item.id}
+                        style={[
+                          mainStyles.cardList,
+                          {
+                            borderRightColor: item.minister.color,
+                            borderRightWidth: 10
+                          }]
+                        }
+                      >
+                        <View
+                          style={{
+                            marginLeft: 13,
                           }}
-                          key={item.id}
-                          style={[styles.taskListContent, { borderRightColor: item.minister.color, borderRightWidth: 10 }]}
                         >
                           <View
                             style={{
-                              marginLeft: 13,
+                              flexDirection: 'row',
+                              alignItems: 'center',
                             }}
                           >
                             <View
                               style={{
-                                flexDirection: 'row',
-                                alignItems: 'center',
+                                height: 12,
+                                width: 12,
+                                borderRadius: 6,
+                                backgroundColor: item.minister.color,
+                                marginRight: 8,
+                              }}
+                            />
+                            <Text
+                              style={{
+                                color: '#fff',
+                                fontSize: 18,
+                                fontWeight: '700',
                               }}
                             >
-                              <View
-                                style={{
-                                  height: 12,
-                                  width: 12,
-                                  borderRadius: 6,
-                                  backgroundColor: item.minister.color,
-                                  marginRight: 8,
-                                }}
-                              />
+                              {item.minister.name} - {moment(item.date).format('HH:mm')}
+                            </Text>
+                          </View>
+                          <View>
+                            <View
+                              style={{
+                                flexDirection: 'row',
+                                marginLeft: 10,
+                                marginTop: 10
+                              }}
+                            >
                               <Text
                                 style={{
                                   color: '#fff',
-                                  fontSize: 18,
-                                  fontWeight: '700',
+                                  fontSize: 14,
                                 }}
                               >
-                                {item.minister.name} - {moment(item.date).format('HH:mm')}
+                                {item.ministry.name} / {item.functions.join(' & ')}
                               </Text>
                             </View>
-                            <View>
-                              <View
-                                style={{
-                                  flexDirection: 'row',
-                                  marginLeft: 10,
-                                  marginTop: 10
-                                }}
-                              >
-                                <Text
-                                  style={{
-                                    color: '#fff',
-                                    fontSize: 14,
-                                  }}
-                                >
-                                  {item.ministry.name} / {item.functions.join(' & ')}
-                                </Text>
-                              </View>
-                            </View>
                           </View>
-                        </TouchableOpacity>
-                      ))}
-                    </ScrollView>
+                        </View>
+                      </TouchableOpacity>
+                    ))}
+                    {/* </ScrollView> */}
                   </View>
                 </View>
               </View>

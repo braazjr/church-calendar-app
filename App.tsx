@@ -23,7 +23,7 @@ import { Image } from 'react-native';
 import Toast, { BaseToast } from 'react-native-toast-message';
 
 import Login from './src/screens/login/Login';
-import { mainStyle } from './config/styles';
+import { mainStyleColors } from './config/styles';
 import { checkUserFromFirestore, isLeader } from './src/services/authentication';
 import CreateTask from './src/screens/task/CreateTask';
 import MinisterListScreen from './src/screens/minister/MinisterList';
@@ -134,7 +134,7 @@ const toastConfig = {
   success: ({ text1, text2, ...rest }) => (
     <BaseToast
       {...rest}
-      style={{ borderLeftColor: mainStyle.primaryColor }}
+      style={{ borderLeftColor: mainStyleColors.primaryColor }}
       contentContainerStyle={{ paddingHorizontal: 15 }}
       text1Style={{
         fontSize: 15,
@@ -189,13 +189,13 @@ export default class App extends Component {
             height: 70 + insets.bottom,
             borderTopWidth: 3,
             elevation: 0,
-            borderTopColor: mainStyle.primaryColor,
+            borderTopColor: mainStyleColors.primaryColor,
           },
           tabStyle: {
             paddingTop: 5,
             paddingBottom: 12,
           },
-          activeTintColor: mainStyle.primaryColor,
+          activeTintColor: mainStyleColors.primaryColor,
         }}
         screenOptions={({ route }) => ({
           tabBarIcon: ({ focused, color, size }) => {
@@ -218,7 +218,7 @@ export default class App extends Component {
             if (route.name !== 'conta') {
               return <Icon
                 name={iconName}
-                color={focused ? mainStyle.primaryColor : color}
+                color={focused ? mainStyleColors.primaryColor : color}
                 size={20}
               />
             } else {
@@ -257,7 +257,7 @@ export default class App extends Component {
           ref={(ref) => Toast.setRef(ref)}
           style={{
             zIndex: 999,
-            borderLeftColor: mainStyle.primaryColor,
+            borderLeftColor: mainStyleColors.primaryColor,
           }}
           config={toastConfig}
         />

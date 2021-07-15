@@ -1,5 +1,5 @@
-import { Platform, StyleSheet } from 'react-native';
-import { mainStyle } from '../../../../config/styles';
+import { StyleSheet } from 'react-native';
+import { mainStyleColors } from '../../../../config/styles';
 
 export const styles = StyleSheet.create({
     createButton: {
@@ -111,7 +111,7 @@ export const styles = StyleSheet.create({
     },
     container: {
       flex: 1,
-      backgroundColor: mainStyle.primaryOpacityColor,
+      backgroundColor: mainStyleColors.primaryOpacityColor,
     },
     listContent: {
         height: 80,

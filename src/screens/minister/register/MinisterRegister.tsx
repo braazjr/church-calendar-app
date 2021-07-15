@@ -16,6 +16,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { deleteMinister, updateMinister } from '../../../services/minister';
 import { styles } from './styles';
 import { hasNotch } from '../../../utils/device.util';
+import { mainStyles, mainStyleColors } from '../../../../config/styles';
 
 const { width: vw } = Dimensions.get('window');
 
@@ -130,7 +131,8 @@ export default class MinisterRegister extends Component {
           <View
             style={{
               height: visibleHeight,
-              paddingTop: Platform.OS == 'android' ? 60 : hasNotch() ? 50 : 15,
+              // paddingTop: Platform.OS == 'android' ? 50 : hasNotch() ? 50 : 15,
+              marginTop: Platform.OS == 'android' || hasNotch() ? 80 : 50,
             }}
           >
             <ScrollView
@@ -314,7 +316,7 @@ export default class MinisterRegister extends Component {
 
               <TouchableOpacity
                 style={[
-                  styles.createButton,
+                  mainStyles.button,
                   {
                     backgroundColor: 'rgba(230, 166, 45, 0.5)',
                   }
@@ -339,12 +341,12 @@ export default class MinisterRegister extends Component {
 
               <TouchableOpacity
                 style={[
-                  styles.createButton,
+                  mainStyles.button,
                   {
                     backgroundColor:
                       name === ''
                         ? '#31a09a3d'
-                        : '#32a19b',
+                        : mainStyleColors.primaryColor,
                     marginTop: 10,
                   },
                 ]}
@@ -370,7 +372,7 @@ export default class MinisterRegister extends Component {
               {ministerId &&
                 <TouchableOpacity
                   style={[
-                    styles.createButton,
+                    mainStyles.button,
                     {
                       backgroundColor: 'rgba(230, 45, 57, 0.5)',
                       marginTop: 10,

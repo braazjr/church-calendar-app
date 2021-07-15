@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Text, View } from "react-native";
-
+import { mainStyleColors } from "../../config/styles";
 
 export default class InfoBoxComponent extends Component {
     state = {
@@ -21,7 +21,7 @@ export default class InfoBoxComponent extends Component {
                             width: '90%',
                             alignSelf: 'center',
                             borderRadius: 10,
-                            backgroundColor: '#32a19b',
+                            backgroundColor: mainStyleColors.primaryColor,
                             marginTop: 10,
                             marginBottom: 10,
                             shadowOffset: {

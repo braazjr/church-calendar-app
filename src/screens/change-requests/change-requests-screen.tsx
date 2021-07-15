@@ -6,6 +6,7 @@ import {
   Text,
   Dimensions,
   Alert,
+  RefreshControl,
 } from 'react-native';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -13,16 +14,16 @@ import moment from 'moment';
 
 import { styles } from './styles'
 import { getLoggedUser } from '../../services/authentication';
-import { mainStyle } from '../../../config/styles';
+import { mainStyleColors, mainStyles } from '../../../config/styles';
 import { deleteChangeRequest, doneChangeRequest, changeRequestCollection } from '../../services/change-requests.service';
 import LoadingComponent from '../../components/loading.component';
-import { hasNotch } from '../../utils/device.util';
 
 export default class ChangeRequestsScreen extends Component {
   state = {
     changeRequests: [],
     isLoading: false,
-    loggedUserId: undefined
+    loggedUserId: undefined,
+    isRefreshing: false,
   };
 
   componentDidMount() {
@@ -50,7 +51,8 @@ export default class ChangeRequestsScreen extends Component {
       this.setState({
         changeRequests: data,
         loggedUserId: loggedUser.id,
-        isLoading: false
+        isLoading: false,
+        isRefreshing: false,
       })
     })
   }
@@ -61,6 +63,7 @@ export default class ChangeRequestsScreen extends Component {
         changeRequests,
         isLoading,
         loggedUserId,
+        isRefreshing,
       },
     } = this;
 
@@ -72,7 +75,8 @@ export default class ChangeRequestsScreen extends Component {
           <View
             style={{
               flex: 1,
-              marginTop: hasNotch() ? 50 : 20,
+              // marginTop: hasNotch() ? 50 : 20,
+              marginTop: 50,
               backgroundColor: '#fff'
             }}
           >
@@ -86,7 +90,16 @@ export default class ChangeRequestsScreen extends Component {
               <Text style={styles.title}>
                 trocas
             </Text>
-              <ScrollView>
+              <ScrollView
+                refreshControl={
+                  <RefreshControl
+                    refreshing={isRefreshing}
+                    onRefresh={() => {
+                      this.componentDidMount()
+                    }}
+                  />
+                }
+              >
                 {
                   changeRequests.length == 0 &&
                   (
@@ -132,11 +145,12 @@ export default class ChangeRequestsScreen extends Component {
                   <View
                     key={item.id}
                     style={[
-                      styles.listContent,
+                      mainStyles.cardList,
                       {
+                        height: 'auto',
                         borderRightColor: item.task.minister.color,
                         borderRightWidth: 10,
-                        backgroundColor: item.done ? mainStyle.primaryOpacityColor : mainStyle.primaryColor
+                        backgroundColor: item.done ? mainStyleColors.primaryOpacityColor : mainStyleColors.primaryColor
                       }
                     ]}
                   >

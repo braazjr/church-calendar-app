@@ -5,6 +5,7 @@ import {
   ScrollView,
   Text,
   Dimensions,
+  RefreshControl,
 } from 'react-native';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -13,13 +14,15 @@ import { styles } from './styles'
 import { getMinisters } from '../../services/minister';
 import { getUsersFromMinister } from '../../services/user';
 import LoadingComponent from '../../components/loading.component';
-import { hasNotch } from '../../utils/device.util';
 import { getLoggedUser } from '../../services/authentication';
+import { mainStyles } from '../../../config/styles';
 
 export default class MinisterListScreen extends Component {
   state = {
     isLoading: false,
-    ministers: []
+    ministers: [],
+    isAdmin: false,
+    isRefreshing: false,
   };
 
   async componentDidMount() {
@@ -37,6 +40,8 @@ export default class MinisterListScreen extends Component {
             this.setState({
               isLoading: false,
               ministers: data,
+              isAdmin: loggedUser.isAdmin,
+              isRefreshing: false,
             })
           })
       });
@@ -47,6 +52,8 @@ export default class MinisterListScreen extends Component {
       state: {
         isLoading,
         ministers,
+        isAdmin,
+        isRefreshing,
       },
       props: { navigation },
     } = this;
@@ -59,28 +66,34 @@ export default class MinisterListScreen extends Component {
           <View
             style={{
               flex: 1,
-              marginTop: hasNotch() ? 50 : 20,
+              // marginTop: hasNotch() ? 50 : 20,
+              marginTop: 50,
               backgroundColor: '#fff'
             }}
           >
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate('MinisterRegister', {
-                })
-              }}
-              style={styles.view}
-            >
-              <Icon
-                name="plus"
-                color={'#fff'}
-                size={30}
-                style={{
-                  paddingLeft: 2,
-                  paddingTop: 2,
-                  alignSelf: 'center',
-                }}
-              />
-            </TouchableOpacity>
+            {
+              isAdmin &&
+              (
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate('MinisterRegister', {
+                    })
+                  }}
+                  style={styles.view}
+                >
+                  <Icon
+                    name="plus"
+                    color={'#fff'}
+                    size={30}
+                    style={{
+                      paddingLeft: 2,
+                      paddingTop: 2,
+                      alignSelf: 'center',
+                    }}
+                  />
+                </TouchableOpacity>
+              )
+            }
             <View
               style={{
                 width: '100%',
@@ -93,6 +106,14 @@ export default class MinisterListScreen extends Component {
                 contentContainerStyle={{
                   paddingBottom: '30%',
                 }}
+                refreshControl={
+                  <RefreshControl
+                    refreshing={isRefreshing}
+                    onRefresh={() => {
+                      this.componentDidMount()
+                    }}
+                  />
+                }
               >
                 {ministers.map(item => (
                   <TouchableOpacity
@@ -104,7 +125,14 @@ export default class MinisterListScreen extends Component {
                       })
                     }}
                     key={item.id}
-                    style={[styles.listContent, { borderRightColor: item.color, borderRightWidth: 10 }]}
+                    style={[
+                      mainStyles.cardList,
+                      {
+                        height: 80,
+                        borderRightColor: item.color,
+                        borderRightWidth: 10
+                      }
+                    ]}
                   >
                     <View
                       style={{

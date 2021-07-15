@@ -143,7 +143,10 @@ export default class ManagerUsers extends Component {
                             if (text.nativeEvent.text.length >= 3) {
                               this.setState({
                                 usersFound: avaiableUsers
-                                  .filter(au => au.name.toLowerCase().includes(text.nativeEvent.text.toLowerCase()))
+                                  .filter(au => {
+                                    return au.name.toLowerCase().includes(text.nativeEvent.text.toLowerCase())
+                                      || au.email.toLowerCase().includes(text.nativeEvent.text.toLowerCase())
+                                  })
                               })
                             }
                           }}
@@ -171,7 +174,7 @@ export default class ManagerUsers extends Component {
                       >
                         <View
                           style={{
-                            flex: 1
+                            flex: 3
                           }}
                         >
                           <Text
@@ -181,7 +184,17 @@ export default class ManagerUsers extends Component {
                               fontWeight: '700',
                             }}
                           >
-                            {item.name}
+                            {item.name || 'Sem nome'}
+                          </Text>
+                          <Text
+                            style={{
+                              color: '#554A4C',
+                              fontSize: 12,
+                              fontWeight: '500',
+                            }}
+                          >
+                            {'\n'}
+                            {item.email}
                           </Text>
                         </View>
                         <View

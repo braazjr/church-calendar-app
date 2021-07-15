@@ -4,7 +4,7 @@ import * as Animatable from "react-native-animatable";
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 import { styles } from "./styles";
-import { mainStyle } from "../../../config/styles";
+import { mainStyleColors } from "../../../config/styles";
 import { signInWithApple, signInWithGoogle } from "../../services/authentication";
 import LoadingComponent from "../../components/loading.component";
 
@@ -41,7 +41,7 @@ export default class LoginScreen extends Component {
                         <Animatable.View
                             animation="fadeInUpBig"
                             style={[styles.footer, {
-                                backgroundColor: mainStyle.primaryColor
+                                backgroundColor: mainStyleColors.primaryColor
                             }]}
                         >
                             <TouchableOpacity
@@ -51,7 +51,7 @@ export default class LoginScreen extends Component {
                                         .finally(() => setTimeout(() => this.setState({ isLoading: false }), 2000))
                                 }}
                                 style={[styles.signIn, {
-                                    backgroundColor: mainStyle.secondayColor,
+                                    backgroundColor: mainStyleColors.secondayColor,
                                     marginTop: 15,
                                     marginBottom: 15,
                                 }]}
@@ -59,7 +59,7 @@ export default class LoginScreen extends Component {
                                 <Icon
                                     name="google"
                                     size={20}
-                                    color={mainStyle.primaryColor} />
+                                    color={mainStyleColors.primaryColor} />
                             </TouchableOpacity>
                             {
                                 Platform.OS == 'ios' &&
@@ -71,13 +71,13 @@ export default class LoginScreen extends Component {
                                                 .finally(() => setTimeout(() => this.setState({ isLoading: false }), 2000))
                                         }}
                                         style={[styles.signIn, {
-                                            backgroundColor: mainStyle.secondayColor,
+                                            backgroundColor: mainStyleColors.secondayColor,
                                         }]}
                                     >
                                         <Icon
                                             name="apple"
                                             size={20}
-                                            color={mainStyle.primaryColor} />
+                                            color={mainStyleColors.primaryColor} />
                                     </TouchableOpacity>
                                 )
                             }

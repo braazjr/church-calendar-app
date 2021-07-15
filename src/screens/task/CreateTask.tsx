@@ -25,6 +25,7 @@ import { createChangeRequest } from '../../services/change-requests.service';
 import { Task } from '../../models/task-model';
 import { hasNotch } from '../../utils/device.util';
 import { Minister } from '../../models/minister.model';
+import { mainStyleColors, mainStyles } from '../../../config/styles';
 
 const { width: vw } = Dimensions.get('window');
 // moment().format('YYYY/MM/DD')
@@ -309,7 +310,8 @@ export default class CreateTask extends Component {
           <View
             style={{
               height: Platform.OS == 'android' ? '100%' : visibleHeight,
-              paddingTop: Platform.OS == 'android' ? 76 : hasNotch() ? 80 : 50,
+              // paddingTop: Platform.OS == 'android' ? 76 : hasNotch() ? 80 : 50,
+              paddingTop: Platform.OS == 'android' || hasNotch() ? 80 : 50,
             }}
           >
             <ScrollView
@@ -365,22 +367,22 @@ export default class CreateTask extends Component {
                     hideArrows
                     // markingType="simple"
                     theme={{
-                      selectedDayBackgroundColor: '#32a19b',
+                      selectedDayBackgroundColor: mainStyleColors.primaryColor,
                       selectedDayTextColor: '#ffffff',
-                      todayTextColor: '#32a19b',
+                      todayTextColor: mainStyleColors.primaryColor,
                       calendarBackground: 'transparent',
                       textDisabledColor: '#d9dbe0',
                     }}
                     markedDates={{
                       [moment(selectedDate).format('yy-MM-DD')]: {
                         selected: true,
-                        selectedColor: '#32a19b',
+                        selectedColor: mainStyleColors.primaryColor,
                       },
                     }}
                   />
                 </View>)
               }
-              <View style={styles.taskContainer}>
+              <View style={mainStyles.cardContainer}>
                 <View>
                   <Text
                     style={{
@@ -523,11 +525,11 @@ export default class CreateTask extends Component {
                 (!taskId || isMinisterLead) &&
                 (<TouchableOpacity
                   style={[
-                    styles.createTaskButton,
+                    mainStyles.button,
                     {
                       backgroundColor:
                         isEdit
-                          ? '#32a19b'
+                          ? mainStyleColors.primaryColor
                           : '#31a09a3d',
                     },
                   ]}
@@ -550,7 +552,7 @@ export default class CreateTask extends Component {
               {isMinisterLead && taskId &&
                 <TouchableOpacity
                   style={[
-                    styles.createTaskButton,
+                    mainStyles.button,
                     {
                       backgroundColor:
                         isEdit
@@ -599,7 +601,7 @@ export default class CreateTask extends Component {
                 (
                   <TouchableOpacity
                     style={[
-                      styles.createTaskButton,
+                      mainStyles.button,
                       {
                         backgroundColor:
                           isEdit

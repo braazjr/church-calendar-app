@@ -9,4 +9,5 @@ export class User {
     // uid: string;
     ministersLead: string[];
     isLeader?: boolean;
+    isAdmin?: boolean;
 }
